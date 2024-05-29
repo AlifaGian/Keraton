@@ -1,11 +1,25 @@
 <script setup>
-import { ref } from "vue";
+import { ref, computed } from "vue";
+import { defineProps, defineExpose } from "vue";
 import NavBar from "../components/NavBar.vue";
+import PaymentPopup from "../components/PaymentPopup.vue";
+import PaymentDropdown from "../components/PaymentDropdown.vue";
+import AfterCheckoutViews from "../pages/AfterCheckoutViews.vue";
 
+const searchQuery = ref("");
 const detail = ref(false);
 const cara = ref(false);
-const selectedStatus = ref("sudahDigunakan");
+const selectedStatus = ref(""); // Set default value to empty string
 const statusSelected = ref(false);
+const { totalPayment } = defineProps(["totalPayment"]);
+const virtualAccount = ref(8883123456789012);
+const { paymentPopup } = AfterCheckoutViews;
+
+const showPopup = ref(false);
+
+const showPaymentPopup = () => {
+  showPopup.value = true;
+};
 
 const openDetailTransaksi = () => {
   detail.value = !detail.value;
@@ -17,10 +31,16 @@ const closeDetailTransaksi = () => {
 
 const openMenungguPembayaran = () => {
   cara.value = !cara.value;
+  showPaymentPopup();
 };
 
 const closeMenungguPembayaran = () => {
   cara.value = false;
+};
+
+const openAfterCheckout = () => {
+  const toaftercheckout = "/#/aftercheckout";
+  window.open(toaftercheckout, "_blank");
 };
 
 const transactions = [
@@ -29,8 +49,10 @@ const transactions = [
     label: "Sudah digunakan",
     class: "sudah__digunakan",
     cardClass: "card-1",
+    popup: "sudahdigunakan",
+    value: "1",
     actions: [
-      { label: "Lihat detail transaksi", handler: openDetailTransaksi },
+      { detail: "Lihat detail transaksi", handler: openDetailTransaksi },
       { label: "|" },
       { label: "Bantuan", handler: null }, // Handler bisa diisi sesuai kebutuhan
     ],
@@ -40,8 +62,10 @@ const transactions = [
     label: "Dapat digunakan",
     class: "dapat__digunakan",
     cardClass: "card-2",
+    popup: "dapatdigunakan",
+    value: "2",
     actions: [
-      { label: "Lihat detail transaksi", handler: openDetailTransaksi },
+      { detail: "Lihat detail transaksi", handler: openDetailTransaksi },
       { label: "|" },
       { label: "Bantuan", handler: null }, // Handler bisa diisi sesuai kebutuhan
     ],
@@ -51,10 +75,12 @@ const transactions = [
     label: "Expired",
     class: "expired",
     cardClass: "card-3",
+    popup: "expired",
+    value: "3",
     actions: [
-      { label: "Lihat detail transaksi", handler: openDetailTransaksi },
+      { detail: "Lihat detail transaksi", handler: openDetailTransaksi },
       { label: "|" },
-      { label: "Bantuan", handler: null }, // Handler bisa diisi sesuai kebutuhan
+      { label: "Bantuan", handler: null },
     ],
   },
   {
@@ -62,24 +88,108 @@ const transactions = [
     label: "Menunggu pembayaran",
     class: "menunggu__pembayaran",
     cardClass: "card-4",
+    value: "4",
     actions: [
-      { label: "Lihat detail", handler: openDetailTransaksi },
+      {
+        detail: "Lihat detail",
+        handler: openAfterCheckout, // Menggunakan path rute
+      },
       { label: "|" },
       { label: "Cara Pembayaran", handler: openMenungguPembayaran },
     ],
   },
 ];
-</script>
 
+const condition = (transactions) => {
+  let stats = ""; // Menggunakan let agar bisa diubah
+  switch (transactions.label) {
+    case "sudah__digunakan":
+      stats = "Sudah digunakan";
+      break;
+    case "dapat__digunakan":
+      stats = "Dapat digunakan";
+      break;
+    case "expired":
+      stats = "Expired";
+      break;
+    default:
+      stats = "default";
+      break;
+  }
+  return stats; // Mengembalikan hasil
+};
+
+const currentTransaction = computed(() => {
+  if (!selectedStatus.value) {
+    return transactions;
+  }
+  return transactions.filter(
+    (transaction) => transaction.status === selectedStatus.value
+  );
+});
+
+const copyContent = (content) => {
+  if (content === "copyVirtualAccount") {
+    navigator.clipboard
+      .writeText(virtualAccount.value)
+      .then(() => {
+        console.log("Konten berhasil disalin!");
+      })
+      .catch((err) => {
+        console.error("Gagal menyalin konten:", err);
+      });
+  } else {
+    navigator.clipboard
+      .writeText(totalPayment.trim())
+      .then(() => {
+        console.log("Konten berhasil disalin!");
+      })
+      .catch((err) => {
+        console.error("Gagal menyalin konten:", err);
+      });
+  }
+};
+
+const displayedVirtualAccount = computed(() => {
+  const virtualAccountString = virtualAccount.value.toString();
+  const firstDigits = virtualAccountString.substring(0, 4);
+  return firstDigits + "xxxxxxxx";
+});
+
+defineExpose({
+  showPaymentPopup,
+  displayedVirtualAccount,
+});
+</script>
+<script>
+export default {
+  data() {
+    return {
+      isOpen: false,
+      options: [
+        { label: "Sudah digunakan", value: "sudahDigunakan" },
+        { label: "Dapat digunakan", value: "dapatDigunakan" },
+        { label: "Expired", value: "expired" },
+        { label: "Menunggu pembayaran", value: "menungguPembayaran" },
+      ],
+    };
+  },
+  methods: {
+    toggleDropdown() {
+      this.isOpen = !this.isOpen;
+    },
+  },
+};
+</script>
 <template>
   <div class="all-content">
     <div>
       <nav class="navbar">
-        <NavBar border />
+        <NavBar />
       </nav>
       <div class="content">
         <div>
-          <h1 class="title">History transaksi</h1>
+          <div class="title">History transaksi</div>
         </div>
         <div class="container">
           <div class="form-input">
@@ -108,49 +218,56 @@ const transactions = [
               <select
                 name="Status"
                 placeholder="status"
-                value="Status"
                 v-model="selectedStatus"
                 @change="statusSelected = true"
                 class="custom-select"
               >
-                <option value="sudahDigunakan">Sudah digunakan</option>
-                <option value="dapatDigunakan">Dapat digunakan</option>
-                <option value="expired">Expired</option>
-                <option value="menungguPembayaran">Menunggu pembayaran</option>
+                <option value="">Status</option>
+                <option
+                  v-for="option in options"
+                  :key="option.value"
+                  :value="option.value"
+                >
+                  {{ option.label }}
+                </option>
               </select>
             </div>
           </div>
         </div>
       </div>
-      <div
-        v-for="transaction in transactions"
-        :key="transaction.status"
-        class="tabel"
-      >
-        <div :class="transaction.cardClass">
-          <div class="tiket">
+      <div class="tabel">
+        <div
+          v-for="transaction in currentTransaction"
+          :key="transaction.status"
+          :class="transaction.cardClass"
+          class="tiket"
+        >
+          <div class="tikets">
             <div class="tiket__header-container">
               <img
                 src="../assets/images/Vector.png"
                 alt="icon-tiket"
                 class="icon-tiket"
               />
-              <p>Tiket</p>
-              <label>17 Agu 2023</label>
+              <div class="tiket-txt">Tiket</div>
+              <div class="waktu-txt">17 Agu 2023</div>
               <p :class="transaction.class">{{ transaction.label }}</p>
             </div>
             <div class="tiket__content">
               <img src="../assets/images/img-1.jpg" alt="" />
               <div class="tiket__content-details">
-                <h6>Tiket Masuk Keraton Kasepuhan Cirebon+Museum+...</h6>
+                <div class="info-detail-tiket-namaTiket">
+                  Tiket Masuk Keraton Kasepuhan Cirebon+Museum+Dalem Agung
+                  Pakungwati
+                </div>
                 <div class="label">
-                  <label class="labelharga">1 tiket x Rp. 10.000</label><br />
-                  <label>+2 tiket lainnya</label>
+                  <div class="labelharga">1 tiket x Rp. 10.000</div>
+                  <div class="labelharga">+2 tiket lainnya</div>
                 </div>
                 <div class="total">
                   <div class="info">
-                    <p class="total__belanja">Total belanja</p>
-                    <p class="hrga">Rp. 33.500</p>
+                    <div class="total__belanja">Total belanja</div>
+                    <div class="hrga">Rp. 33.500</div>
                   </div>
                   <div class="actions">
                     <a
@@ -159,13 +276,11 @@ const transactions = [
                       @click="action.handler"
                       class="detail"
                     >
-                      <p class="bantu">{{ action.label }}</p>
+                      <div class="bantu">
+                        <div class="detail">{{ action.detail }}</div>
+                        {{ action.label }}
+                      </div>
                     </a>
-                    <a
-                      href=""
-                      class="bantuan"
-                      v-if="transaction.status !== 'menungguPembayaran'"
-                    ></a>
                   </div>
                 </div>
               </div>
@@ -174,75 +289,151 @@ const transactions = [
         </div>
       </div>
 
+
       <!-- popup -->
+
       <section class="detail-transaksi" v-if="detail">
         <div class="popup">
           <div class="popup-content">
             <div class="header">
-              <h1 class="p">Detail Transaksi</h1>
+              <div class="p">Detail Transaksi</div>
               <span class="close" @click="closeDetailTransaksi"
                 ><img src="../assets/images/close.png" class="Icon"
               /></span>
             </div>
             <div class="isi">
-              <small class="label-card1">Sudah digunakan</small>
+              <small class="sudah__digunakan">{{
+                condition(transactions)
+              }}</small>
               <div class="info__details">
                 <div class="flex-container">
                   <div>
-                    <h6>No. Transaksi</h6>
-                    <p>INV/20230817/MPL/3721648145</p>
+                    <div class="flex-container">No. Transaksi</div>
+                    <div class="flex-container">
+                      INV/20230817/MPL/3721648145
+                    </div>
                   </div>
                   <div>
-                    <h6>Tanggal Pembelian</h6>
-                    <p>15 Agustus 2023, 10:00 WIB</p>
+                    <div class="flex-container">Tanggal Pembelian</div>
+                    <div class="flex-container">15 Agustus 2023, 10:00 WIB</div>
                   </div>
                 </div>
-                <h6 class="detailtiket">Detail tiket</h6>
+                <div class="detailtiket">Detail tiket</div>
                 <div class="detail-tiket">
                   <img src="../assets/svg/gambarKraton.svg" alt="" />
                   <div class="info-detail-tiket">
-                    <p>Tiket Masuk Keraton Kasepuhan (UMUM)</p>
-                    <label class="harga">17 Agu 2023; 10:00; </label>
-                    <label class="harga">1 x Rp. 10.000</label>
+                    <div class="info-detail-tiket-namaTiket-pp">
+                      Tiket Masuk Keraton Kasepuhan (UMUM)
+                    </div>
+                    <div class="waktu">17 Agu 2023; 10:00;</div>
+                    <div class="harga">1 x Rp. 10.000</div>
                   </div>
                 </div>
                 <div class="all-tiket">
-                  <small
-                    >Lihat semua tiket
-                    <img src="../assets/svg/panahBawah.svg" alt=""
-                  /></small>
+                  <small>
+                    Lihat semua tiket
+                    <img src="../assets/svg/panahBawah.svg" alt="" />
+                  </small>
                 </div>
-                <h6 class="info-pembayaran">Info pembayaran</h6>
+                <div class="info-pembayaran">Info pembayaran</div>
                 <div class="status-pembayaran">
-                  <h6>Status pembayaran</h6>
-                  <small>Berhasil</small>
+                  <div class="status-pembayaran">Status pembayaran</div>
+                  <div class="small">Berhasil</div>
                 </div>
                 <div class="pemesan">
-                  <h6>Pemesan</h6>
-                  <p>John Doe<label>/johndoe@keraton.com</label></p>
+                  <div class="pemesan-txt">Pemesan</div>
+                  <div class="pemesan-usn">
+                    John Doe
+                    <div class="pemesan-email">/johndoe@keraton.com</div>
+                  </div>
                 </div>
-                <div class="metode-pmbayaran">
-                  <h6>Metode Pembayaran</h6>
-                  <p>BJB Virtual Account</p>
+                <div class="metode-pembayaran">
+                  <div class="metode-pembayaran-txt">Metode Pembayaran</div>
+                  <div class="metode-pembayaran-bank">BJB Virtual Account</div>
                 </div>
-                <div class="total-harga-3-Tiket">
-                  <h6>Total Harga(3 Tiket)</h6>
-                  <p>Rp. 30.000</p>
+                <div class="total-harga">
+                  <div class="total-harga-txt">Total Harga(3 Tiket)</div>
+                  <div class="total-harga-total">Rp. 30.000</div>
                 </div>
                 <div class="biaya-layanan">
-                  <h6>Biaya Layanan</h6>
-                  <p>Rp. 3.500</p>
+                  <div class="biaya-layanan-txt">Biaya Layanan</div>
+                  <div class="biaya-layanan-harga">Rp. 3.500</div>
                 </div>
                 <div class="line"></div>
                 <div class="total-biaya">
-                  <h6>Total Biaya</h6>
-                  <p>Rp. 33.500</p>
+                  <div class="total-biaya-txt">Total Biaya</div>
+                  <div class="total-biaya-total">Rp. 33.500</div>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </section>
+      <!-- <section class="detail-transaksi" v-if="detail">
+        <div class="popup">
+            <div class="popup-content">
+              <div class="header">
+                <h1 class="p">Detail Transaksi</h1>
+                <span class="close" @click="closeDetailTransaksi"><img src="../assets/images/close.png" class="Icon"></span>
+                </div>
+                <div class="isi">
+                <small class="label-card1">Sudah digunakan</small>
+                <div class="info__details">
+                  <div class="flex-container">
+                    <div>
+                      <h6>No. Transaksi</h6>
+                      <p>INV/20230817/MPL/3721648145</p>
+                    </div>
+                    <div>
+                      <h6>Tanggal Pembelian</h6>
+                      <p>15 Agustus 2023, 10:00 WIB</p>
+                    </div>
+                  </div>
+                  <h6 class="detailtiket">Detail tiket</h6>
+                  <div class="detail-tiket">
+                  <img src="../assets/svg/gambarKraton.svg" alt="">
+                  <div class="info-detail-tiket">
+                    <p>Tiket Masuk Keraton Kasepuhan (UMUM)</p>
+                    <label class="harga">17 Agu 2023; 10:00; </label>
+                    <label class="harga">1 x Rp. 10.000</label>
+                </div>
+              </div>
+              <div class="all-tiket">
+              <small>Lihat semua tiket  <img src="../assets/svg/panahBawah.svg" alt="" ></small>
+              </div>
+              <h6 class="info-pembayaran">Info pembayaran</h6>
+              <div class="status-pembayaran">
+                <h6>Status pembayaran</h6>
+                <small>Berhasil</small>
+              </div>
+              <div class="pemesan">
+                <h6>Pemesan</h6>
+                <p>John Doe<label>/johndoe@keraton.com</label></p>
+              </div>
+              <div class="metode-pmbayaran">
+                <h6>Metode Pembayaran</h6>
+                <p>BJB Virtual Account</p>
+              </div>
+              <div class="total-harga-3-Tiket">
+                <h6>Total Harga(3 Tiket)</h6>
+                <p>Rp. 30.000</p>
+              </div>
+              <div class="biaya-layanan">
+                <h6>Biaya Layanan</h6>
+                <p>Rp. 3.500</p>
+              </div>
+              <div class="line">
+                
+              </div>
+              <div class="total-biaya">
+                <h6>Total Biaya</h6>
+                <p>Rp. 33.500</p>
+              </div>
+              </div>
+            </div>
+            </div>
+        </div>
+    </section> -->
 
       <section class="detail-transaksi" v-if="cara">
         <div class="popup">
@@ -254,44 +445,47 @@ const transactions = [
               /></span>
             </div>
             <div class="isi">
-              <div class="bjb">
-                <h4>BJB Virtual Account</h4>
-                <img src="../assets/svg/GKL7_Bank BJB Logo.svg" alt="" />
-              </div>
-              <div class="nomor-virtual-account">
-                <div class="nva">
-                  <h6>Nomor Virtual Account</h6>
-                  <h5>8883xxxxxxxxxx</h5>
+              <PaymentPopup ref="paymentPopup" :totalPayment="totalPayment" />
+              <div class="waiting-payment__content-data">
+                <div class="waiting-payment__content-desc">
+                  <p class="fs-h4">BJB Virtual Account</p>
+                  <img :src="logoBJB" alt="logoBJB" />
                 </div>
-                <div class="clipboard">
-                  <p>
-                    Salin <img src="../assets/svg/ClipboardText.svg" alt="" />
-                  </p>
+                <div class="waiting-payment__content-desc">
+                  <div class="waiting-payment__content-sub fs-h5">
+                    <p style="color: rgba(94, 94, 94, 1)">
+                      Nomor Virtual Account
+                    </p>
+                    <p ref="copyVirtualAccount">
+                      {{ displayedVirtualAccount }}
+                    </p>
+                  </div>
+                  <span
+                    class="waiting-payment__copy-desc"
+                    @click="copyContent('copyVirtualAccount')"
+                  >
+                    Salin
+                    <ph-clipboard-text :size="32" weight="bold" class="icon" />
+                  </span>
                 </div>
-              </div>
-              <div class="nomor-virtual-account">
-                <div class="nva">
-                  <h6>Total Pembayaran</h6>
-                  <h5>Rp. 33.500</h5>
+
+                <div class="waiting-payment__content-desc">
+                  <div class="waiting-payment__content-sub fs-h5">
+                    <p style="color: rgba(94, 94, 94, 1)">Total Pembayaran</p>
+                    <p ref="copyTotalPayment">
+                      Rp. <span>{{ totalPayment }}</span>
+                    </p>
+                  </div>
+                  <span
+                    class="waiting-payment__copy-desc"
+                    @click="copyContent('copyTotalPayment')"
+                  >
+                    Salin
+                    <ph-clipboard-text :size="32" weight="bold" class="icon" />
+                  </span>
                 </div>
-                <div class="clipboard">
-                  <p>
-                    Salin <img src="../assets/svg/ClipboardText.svg" alt="" />
-                  </p>
-                </div>
-              </div>
-              <div class="steps">
-                <div class="atm-bjb">
-                  <h5>ATM BJB</h5>
-                  <img src="../assets/svg/CaretDown.svg" alt="" />
-                </div>
-                <div class="mobile-banking-bjb">
-                  <h5>Mobile Banking BJB</h5>
-                  <img src="../assets/svg/CaretDown.svg" alt="" />
-                </div>
-                <div class="internet-banking-bjb">
-                  <h5>Internet Banking BJB</h5>
-                  <img src="../assets/svg/CaretDown.svg" alt="" />
+                <div>
+                  <PaymentDropdown />
                 </div>
               </div>
             </div>
@@ -307,6 +501,7 @@ const transactions = [
 
 .bantu {
   color: #000000;
+  font-weight: 500;
 }
 
 body {
@@ -321,56 +516,94 @@ body {
 }
 
 .content {
-  padding-top: 100px;
+  padding-top: 10vh;
 }
 
-p.bantuan {
-  color: #000000;
-}
-
-h1.title {
+.title {
+  padding-top: 3vw;
   text-align: center;
-  margin-top: 50px;
   color: #333;
-}
-
-nav {
-  position: fixed;
-  width: 100%;
-  top: 0;
-  background-color: #ffffff;
-  z-index: 1000;
+  font-size: 2.4vw;
+  font-weight: 700;
 }
 
 .Pencarian {
-  width: 246px;
-  height: 48px;
-  padding: 12px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
+  width: 17vw; /* 400px */
+  height: 5.556vh; /* 60px */
+  padding: 1.389vh; /* 15px */
+  border: 0.052vw solid #ddd; /* 1px */
+  border-radius: 0.26vw; /* 5px */
   box-sizing: border-box;
-  margin-bottom: 10px;
+  margin-bottom: 0.926vh; /* 10px */
 }
 
 .tanggal {
-  width: 247px;
-  height: 48px;
-  padding: 12px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
+  width: 17vw; /* 402px */
+  height: 5.556vh; /* 60px */
+  padding: 1.481vh; /* 16px */
+  border: 0.052vw solid #ddd; /* 1px */
+  border-radius: 0.26vw; /* 5px */
   box-sizing: border-box;
-  margin-bottom: 10px;
+  margin-bottom: 0.926vh; /* 10px */
 }
 
 select {
+  width: 17vw; /* 384px */
+  padding: 1.481vh; /* 16px */
+  height: 5.556vh; /* 60px */
+  border: 0.052vw solid #ddd; /* 1px */
+  border-radius: 0.26vw; /* 5px */
+  box-sizing: border-box;
+  margin-bottom: 0.926vh; /* 10px */
+  cursor: pointer;
+}
+.dropdown-toggle {
   width: 247px;
   padding: 12px;
   height: 48px;
   border: 1px solid #ddd;
+  background-color: white;
   border-radius: 5px;
   box-sizing: border-box;
   margin-bottom: 10px;
   cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-left: 1.5vw;
+}
+
+.dropdown-toggle img {
+  max-width: 1vw;
+  transition: 0.3s ease;
+}
+
+.rotated {
+  transform: rotate(180deg);
+  transition: 0.3s ease;
+}
+
+.dropdown-menu {
+  position: absolute;
+  width: 17vw;
+  /* height: 48px; */
+  /* top: 274px; */
+  border: 0.15vw solid #ddd;
+  border-radius: 1vw;
+  background-color: #ffffff;
+  font-family: raleway;
+  font-weight: 700;
+  font-size: 0.9vw;
+  line-height: 17.5px;
+  text-align: left;
+  padding-left: 0.3vw;
+  padding-top: 0.5vw;
+  cursor: pointer;
+  z-index: 1;
+}
+
+.dropdown-menu option {
+  font-weight: 700;
 }
 
 option {
@@ -388,131 +621,139 @@ option:selected {
 }
 
 .Pencarian::placeholder,
-.tanggal::placeholder {
+.tanggal::placeholder,
+.select::placeholder {
   color: #999;
-}
-
-img {
-  width: 200px;
-  height: 98.95px;
+  font-size: 1vw;
 }
 
 .tabel {
-  width: 779px;
+  width: 54vw; /* 779px */
   height: fit-content;
-  border-radius: 12px;
-  box-shadow: 0 9px 6px rgba(0, 0, 0, 0.1);
-  margin: 0 auto; /* Mengatur margin horizontal secara otomatis untuk memusatkan */
-  margin-top: 48px;
-  padding: 10px;
-  margin-bottom: 23px;
+  margin-top: 3.5vw; /* 48px */
+  padding: 0.52vw; /* 10px */
+  margin-bottom: 1.197vw; /* 23px */
+  justify-content: center;
+  gap: 1.042vw; /* 20px */
+  margin: auto;
 }
 
 .icon-tiket {
-  width: 18px;
-  height: 13px;
+  margin-top: 0.32vw;
+  margin-left: 1vw;
+  width: 1.5vw;
+  height: 1vw;
 }
 
 .form-input {
   display: flex;
   justify-content: center;
-  gap: 20px;
+  gap: 1vw;
 }
 
 .container {
   text-align: center;
-  margin-top: 50px;
+  margin-top: 5vw;
 }
 
 .tiket__header-container {
   display: flex;
-  gap: 0.5rem;
-  align-items: center;
+  gap: 1vw;
+  margin-top: 1vw;
+}
+.tikets {
+  border-radius: 1vw;
+  box-shadow: 0.3vw 0.3vw 0.3vw rgba(0.1, 0, 0, 0.15);
+  margin-bottom: 1vw;
+  padding-top: 0.1vw;
 }
 
 .tiket__content {
   display: flex;
-  gap: 1rem;
+  height: fit-content;
+  border-radius: 0.625vw; /* 12px */
+  margin: 0 auto; /* Mengatur margin horizontal secara otomatis untuk memusatkan */
+  margin-bottom: 1.197vw; /* 23px */
+  gap: 1.042vw; /* 20px */
 }
 
-.tiket p {
-  font-size: 16px;
+.tiket-txt {
+  font-size: 1.1vw;
   font-weight: 700;
   font: bold;
 }
 
-.tiket label {
-  padding-left: 9px;
-  font-size: 14px;
-  line-height: 22px;
+.waktu-txt {
+  padding-left: -1vw;
+  margin-left: -0.5vw;
+  font-size: 1.1vw;
+  line-height: 1.5vw;
   color: #5e5e5e;
 }
 
-.tiket__content h6 {
-  font-size: 20px;
-  padding-top: 20px;
-  line-height: 28px;
-  padding-bottom: 10px;
+.info-detail-tiket-namaTiket {
+  font-size: 1.35vw;
+  /* padding-top: 20px; */
+  padding-bottom: 1vw;
+  width: 33vw; /* Sesuaikan dengan lebar yang diinginkan */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: -1vw;
 }
 
-p.sudah__digunakan {
-  padding-left: 8px;
-  padding-right: 8px;
-  padding-top: 4px;
-  padding-bottom: 4px;
+p.sudah__digunakan,
+small.sudah__digunakan {
+  padding-left: 0.5vw;
+  padding-right: 0.5vw;
+  padding-top: 0.3vw;
+  padding-bottom: 0.3vw;
   background-color: #a9ffd6;
   color: #149b5a;
-  border-radius: 5px;
-  font-size: 12px;
+  border-radius: 0.4vw;
+  font-size: 0.8vw;
   font-weight: 700;
 }
-p.dapat__digunakan {
-  padding-left: 8px;
-  padding-right: 8px;
-  padding-top: 4px;
-  padding-bottom: 4px;
+p.dapat__digunakan,
+small.dapat__digunakan {
+  padding-left: 0.5vw;
+  padding-right: 0.5vw;
+  padding-top: 0.3vw;
+  padding-bottom: 0.3vw;
   background-color: #a9d1ff;
   color: #146a9b;
-  border-radius: 5px;
-  font-size: 12px;
+  border-radius: 0.4vw;
+  font-size: 0.8vw;
   font-weight: 700;
 }
-p.expired {
-  padding-left: 8px;
-  padding-right: 8px;
-  padding-top: 4px;
-  padding-bottom: 4px;
+p.expired,
+small.expired {
+  padding-left: 0.5vw;
+  padding-right: 0.5vw;
+  padding-top: 0.3vw;
+  padding-bottom: 0.3vw;
   background-color: #e4e4e4;
   color: #828180;
-  border-radius: 5px;
-  font-size: 12px;
+  border-radius: 0.4vw;
+  font-size: 0.8vw;
   font-weight: 700;
 }
 p.menunggu__pembayaran {
-  padding-left: 8px;
-  padding-right: 8px;
-  padding-top: 4px;
-  padding-bottom: 4px;
+  padding-left: 0.5vw;
+  padding-right: 0.5vw;
+  padding-top: 0.3vw;
+  padding-bottom: 0.3vw;
   background-color: #ffcda9;
   color: #9b5514;
-  border-radius: 5px;
-  font-size: 12px;
+  border-radius: 0.4vw;
+  font-size: 0.8vw;
   font-weight: 700;
 }
 
 .tiket__content img {
-  padding-left: 29px;
-  margin-top: 13px;
-  width: 215px;
-  height: 98.95px;
-}
-
-.custom-select option {
-  background-color: #f0f0f0;
-  color: #333;
-  padding: 8px 15px;
-  border-radius: 5px;
-  transition: background-color 0.3s, color 0.3s;
+  padding-left: 3vw;
+  width: 17vw;
+  height: 7vw;
 }
 
 .custom-select option:hover {
@@ -520,13 +761,9 @@ p.menunggu__pembayaran {
   color: #fff;
 }
 
-.label label {
-  padding-right: 100px;
-}
-
-label.labelharga {
+.labelharga {
   font-weight: 400;
-  line-height: 22px;
+  font-size: 1.1vw;
 }
 
 .total {
@@ -536,22 +773,23 @@ label.labelharga {
 }
 
 .info {
-  padding-top: 25px;
+  padding-top: 1vw;
   display: flex;
   flex-direction: column; /* Menyusun paragraf total belanja dan harga secara vertikal */
-  gap: 0.5rem; /* Jarak antara paragraf */
 }
 
 .actions {
   color: #333;
-  padding-top: 45px;
+  padding-top: 2vw;
   display: flex;
-  gap: 0.5rem; /* Jarak antara paragraf */
+  gap: 0.8vw; /* Jarak antara paragraf */
 }
+
 .detail {
   color: #daa520;
   text-decoration: none;
   cursor: pointer;
+  font-weight: 700;
 }
 
 .cara {
@@ -563,33 +801,31 @@ label.labelharga {
 
 .search-icon {
   position: absolute;
-  top: 50%;
-  left: 15px; /* Sesuaikan posisi gambar */
-  transform: translateY(-50%);
-  width: 15px; /* Sesuaikan lebar gambar */
+  top: 0.5vw;
+  left: 1vw; /* Sesuaikan posisi gambar */
+  transform: translateY(-0.5vw);
+  width: 1vw; /* Sesuaikan lebar gambar */
   height: auto; /* Sesuaikan tinggi gambar jika diperlukan */
 }
 
 .Pencarian {
-  padding-left: 30px; /* Sesuaikan padding kiri agar input tidak tumpang tindih dengan gambar */
+  padding-left: 2.5vw; /* Sesuaikan padding kiri agar input tidak tumpang tindih dengan gambar */
 }
 
-.bantuan {
-  color: black;
-  text-decoration: none;
-  size: 16;
+.total__belanja {
+  font-size: 0.9vw;
+  line-height: 2vw;
   font-weight: 400;
+  padding-top: 1vw;
+  margin-right: 2vw;
+  margin-top: -0.5vw;
 }
 
-p.total__belanja {
-  font-size: 12px;
-  line-height: 20px;
-  font-weight: 400;
-  padding-bottom: 1px;
-}
-
-p.hrga {
-  font-size: 16px;
+.hrga {
+  padding-bottom: 1vw;
+  margin-right: 2vw;
+  font-weight: 700;
+  font-size: 1.1vw;
 }
 
 /* popup1 */
@@ -601,33 +837,30 @@ p.hrga {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
+  width: 100vw;
+  height: 100vh;
   background-color: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(2px);
+  backdrop-filter: blur(0.104vw); /* 2px */
   z-index: 999;
 }
 
 .popup-content {
-  background-color: #fefefe;
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  width: 671px;
-  height: 512px;
-  overflow-x: auto;
-  position: relative;
-  overflow-y: hidden;
-  max-height: calc(100vh - 100px);
+  background-color: #ffffff;
+  padding: 0vh; /* 30px */
+  border-radius: 0.52vw; /* 10px */
+  width: 45vw; /* 840px */
+  max-height: 100vh;
+  overflow-y: auto;
 }
 
 .popup-content .isi {
   overflow-y: auto;
-  max-height: calc(100vh - 340px);
+  max-height: calc(130vh - 40vw);
 }
 
 .close {
   color: #aaa;
-  font-size: 28px;
+  font-size: 2vw;
   font-weight: bold;
   cursor: pointer;
 }
@@ -640,44 +873,28 @@ p.hrga {
 }
 
 .isi {
-  padding: 30px;
-  margin-left: 15px;
+  padding: 2vw;
+  margin-left: 1vw;
 }
 
-small.label-card1 {
-  padding-left: 8px;
-  padding-right: 8px;
-  padding-top: 4px;
-  padding-bottom: 4px;
-  background-color: #a9ffd6;
-  color: #149b5a;
-  border-radius: 5px;
-  font-size: 12px;
-  font-weight: 400;
-}
-
-.info__details {
-  display: grid;
-  grid-template-columns: 2 200px;
-}
 .header {
-  box-shadow: 0 1px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 0.0521vw rgba(0, 0, 0, 0.2); /* 1px */
   background: white;
   position: sticky;
-  top: 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1rem 3.2rem;
+  padding: 1.5vw 3.5vw; /* 1.5rem 3.2rem */
 }
-.header h1 {
+
+.p {
   font-weight: 700;
-  z-index: 1000;
+  font-size: 1.5vw; /* 24px */
 }
 
 .Icon {
-  width: 20px;
-  height: 20px;
+  width: 1.3vw; /* 20px */
+  height: 1.3vw; /* 20px */
 }
 
 .info__details {
@@ -686,38 +903,24 @@ small.label-card1 {
 }
 
 .flex-container {
-  padding-top: 15px;
+  padding-top: 1vw;
+  font-weight: 500;
+  font-size: 1.3vw;
 }
 
 .flex-container > div {
   display: flex;
   justify-content: space-between;
-  padding-bottom: 10px;
-}
-
-.flex-container h6 {
-  font-weight: 400;
-  font-size: 20px;
-}
-
-.flex-container p {
-  font-weight: 700;
-  font-size: 16px;
 }
 
 .detail-tiket {
   align-items: center;
 }
-.detail-tiket h6 {
-  font-size: 20px;
-  font-weight: 700;
-  padding-top: 25px;
-}
 
 .detail-tiket img {
-  width: 158px;
-  height: 71.72px;
-  margin: 18px;
+  width: 9vw; /* 158px */
+  height: 5vw; /* 71.72px */
+  margin: 0.9375vw; /* 18px */
 }
 
 .info-detail-tiket p,
@@ -731,22 +934,9 @@ small.label-card1 {
   flex-direction: column; /* Menyusun elemen dalam satu kolom */
 }
 
-.info-detail-tiket p,
-.info-detail-tiket label {
-  margin-right: auto; /* Memindahkan teks ke pinggir kanan */
-}
-
-.info-detail-tiket label {
-  background-color: white;
-  color: hsl(0, 0%, 0%);
-  line-height: 22px;
-  font-size: 14px;
-  font-weight: 400;
-}
-
-.info-detail-tiket p {
-  line-height: 24px;
-  font-size: 16px;
+.info-detail-tiket-namaTiket-pp {
+  line-height: 1.25vw; /* 24px */
+  font-size: 1.2vw; /* 16px */
   font-weight: 400;
 }
 
@@ -754,21 +944,21 @@ small.label-card1 {
   display: flex;
 }
 
-h6.detailtiket {
-  font-size: 20px;
+.detailtiket {
+  font-size: 1.5vw;
   font-weight: 700;
-  padding-top: 30px;
+  padding-top: 3vw;
 }
 
 .all-tiket img {
-  width: 13.75px;
-  height: 7.5px;
+  width: 2vw;
+  height: 0.7vw;
 }
 
 .all-tiket small {
   color: #daa520;
   font-weight: 700;
-  font-size: 12px;
+  font-size: 1vw;
 }
 
 .info-pembayaran {
@@ -780,212 +970,201 @@ h6.detailtiket {
 
 .status-pembayaran {
   display: flex;
-  gap: 20rem;
+  gap: 22vw;
+  font-weight: 400;
+  font-size: 1.3vw;
   padding-bottom: 8px;
 }
 
-.status-pembayaran h6 {
-  font-size: 20px;
-  font-weight: 400;
-  padding-right: 20px;
-}
-
-.status-pembayaran small {
-  padding-left: 8px;
-  padding-right: 8px;
-  padding-top: 4px;
-  padding-bottom: 4px;
+.status-pembayaran .small {
+  padding-left: 0.5vw; /* 8px */
+  padding-right: 0.5vw; /* 8px */
+  padding-top: 0.5vw; /* 7px */
   background-color: #a9ffd6;
   color: #149b5a;
-  border-radius: 5px;
-  font-size: 12px;
-  font-weight: 400;
+  border-radius: 0.2604vw; /* 5px */
+  font-size: 0.9vw; /* 12px */
+  font-weight: 500;
 }
 
 .pemesan {
   display: flex;
-  gap: 15.8rem;
-  padding-top: 8px;
-  padding-bottom: 8px;
-}
-
-.pemesan h6 {
-  font-size: 20px;
+  gap: 15.9vw; /* Mengubah gap dari rem ke vw */
+  font-size: 1.3vw; /* 20px */
   font-weight: 400;
 }
-.pemesan label {
+
+.pemesan-email {
   background-color: #ffffff;
   color: #000000;
-  font-size: 14px;
+  font-size: 1.1vw; /* 14px */
   font-weight: 400;
 }
-.pemesan p {
-  font-size: 16px;
+
+.pemesan-usn {
+  display: flex;
+  font-size: 1.2vw; /* 16px */
   font-weight: 700;
 }
 
-.metode-pmbayaran {
+.metode-pembayaran {
   display: flex;
-  gap: 14.5rem;
-  padding-top: 8px;
-  padding-bottom: 8px;
+  gap: 16vw; /* Mengubah gap dari rem ke vw */
+  padding-top: 0.4167vw; /* 8px */
+  padding-bottom: 0.4167vw; /* 8px */
 }
 
-.metode-pmbayaran h6 {
-  font-size: 20px;
+.metode-pembayaran-txt {
+  font-size: 1.2vw; /* 20px */
   font-weight: 400;
 }
 
-.metode-pmbayaran p {
-  font-size: 16px;
+.metode-pembayaran-bank {
+  font-size: 1.2vw; /* 16px */
   font-weight: 700;
 }
 
-.total-harga-3-Tiket {
+.total-harga {
   display: flex;
-  gap: 20rem;
-  padding-top: 8px;
-  padding-bottom: 8px;
+  gap: 21.5vw; /* Mengubah gap dari rem ke vw */
+  padding-top: 0.4167vw; /* 8px */
+  padding-bottom: 0.4167vw; /* 8px */
 }
 
-.total-harga-3-Tiket h6 {
-  font-size: 20px;
+.total-harga-txt {
+  font-size: 1.3vw; /* 20px */
   font-weight: 400;
 }
 
-.total-harga-3-Tiket p {
-  font-size: 16px;
+.total-harga-total {
+  font-size: 1.2vw; /* 16px */
   font-weight: 700;
 }
 
 .biaya-layanan {
   display: flex;
-  gap: 23.5rem;
-  padding-top: 8px;
-  padding-bottom: 8px;
+  gap: 25.7vw; /* Mengubah gap dari rem ke vw */
+  padding-top: 0.4167vw; /* 8px */
+  padding-bottom: 0.4167vw; /* 8px */
 }
 
-.biaya-layanan h6 {
-  font-size: 20px;
+.biaya-layanan-txt {
+  font-size: 1.2vw; /* 20px */
   font-weight: 400;
 }
 
-.biaya-layanan p {
-  font-size: 16px;
+.biaya-layanan-harga {
+  font-size: 1.2vw; /* 16px */
   font-weight: 700;
 }
 
 .line {
-  height: 2px;
+  height: 0.1042vw; /* 2px */
   width: 100%;
-  margin: 20px auto;
+  margin: 1.0417vw auto; /* 20px */
   background-image: repeating-linear-gradient(
     to right,
     #d9d9d9,
-    #d9d9d9 7px,
-    transparent 5px,
-    transparent 10px
+    #d9d9d9 0.7292vw,
+    /* 7px */ transparent 0.5208vw,
+    /* 5px / transparent 1.0417vw / 10px */
   );
 }
 
 .total-biaya {
   display: flex;
-  gap: 24.5rem;
+  gap: 26.6vw; /* Mengubah gap dari rem ke vw */
 }
-.total-biaya h6 {
-  font-size: 20px;
+
+.total-biaya-txt {
+  font-size: 1.2vw; /* 20px */
   font-weight: 700;
 }
 
-.total-biaya p {
-  font-size: 16px;
+.total-biaya-total {
+  font-size: 1.2vw; /* 16px */
   font-weight: 700;
 }
 
 /* popup2 */
 
-.bjb {
+.waiting-payment__content-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
   display: flex;
-  gap: 14.5rem;
-  font-size: 30px;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
 }
-
-.bjb img {
-  width: 57.24px;
-  height: 28.05px;
+.waiting-payment__container-content {
+  position: relative;
+  background-color: white;
+  border-radius: 10px;
+  width: 671px;
+  height: 512px;
+  display: flex;
+  flex-direction: column;
 }
-
-.nomor-virtual-account {
+.waiting-payment__content-header {
   display: flex;
   flex-direction: row;
+  height: 73px;
+  padding: 1.5rem 3rem;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(208, 213, 221, 1);
+}
+.waiting-payment__close-button {
+  font-size: 32px;
+  color: rgba(52, 51, 48, 1);
+}
+.waiting-payment__close-button:hover {
+  opacity: 0.5;
+}
+.waiting-payment__content-data {
+  display: flex;
+  flex-direction: column;
+  padding: 0rem 2rem;
+  gap: 1rem;
+  overflow-y: auto;
+}
+.waiting-payment__content-desc {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  font-size: 25px;
   justify-content: space-between;
 }
-
-.nva {
-  padding-top: 15px;
+.waiting-payment__content-desc img {
+  width: 58px;
+  height: 28px;
 }
-.nva h6 {
-  font-size: 24px;
-  font-weight: 400;
-  color: #5e5e5e;
-}
-
-.nva h5 {
-  font-size: 24px;
-  padding-top: 5px;
-}
-
-.clipboard {
-  padding-top: 30px;
-  padding-right: 35px;
-}
-
-.clipboard img {
-  width: 32px;
-  height: 32px;
-}
-
-.clipboard p {
+.waiting-payment__copy-desc {
+  color: rgba(218, 165, 32, 1);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 20px;
   font-weight: 700;
-  display: inline-block;
-  vertical-align: middle;
-  color: #daa520;
+  line-height: 24px;
 }
-
-.clipboard img {
-  display: inline-block;
-  vertical-align: middle;
+.waiting-payment__copy-desc i {
+  font-size: 32px;
 }
-
-.steps img {
-  width: 32px;
-  height: 32px;
+.waiting-payment__copy-desc:hover {
+  filter: brightness(70%);
 }
-
-.steps h5 {
-  font-size: 24px;
-  font-weight: 400;
-}
-.atm-bjb {
-  padding-top: 40px;
-  padding-bottom: 10px;
+.waiting-payment__content-sub {
   display: flex;
-  gap: 27rem;
-  border-bottom: 1px solid #d0d5dd;
+  flex-direction: column;
 }
-
-.mobile-banking-bjb {
-  padding-top: 10px;
-  padding-bottom: 10px;
-  display: flex;
-  gap: 19.4rem;
-  border-bottom: 1px solid #d0d5dd;
-}
-
-.internet-banking-bjb {
-  padding-top: 10px;
-  display: flex;
-  gap: 18.8rem;
-  border-bottom: 1px solid #d0d5dd;
+.p fs-f5 {
+  font-size: 25px;
 }
 </style>

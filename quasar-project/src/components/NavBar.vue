@@ -7,6 +7,7 @@
             <img
               alt="icon-aplikasi"
               src="../assets/images/logo_keraton.png"
+              clickable to="/"
               class="app-icon"
               style="margin-left: 1vw;"
             />

@@ -25,9 +25,16 @@
     <p class="bawah-title2">
       Museum ini menyimpan berbagai koleksi benda bersejarah, seperti kereta kencana, gamelan, dan lukisan.
     </p>
-    <div class="slider" ref="slider">
-      <img v-for="(card, index) in cards" :src="card.content" :key="index" :id="'card-' + index"
-        :class="{ cardd: true, active: index === currentIndex }">
+    <div class="container-slider">
+      <div class="slider" ref="slider">
+        <img
+          v-for="(card, index) in cards"
+          :src="card.content"
+          :key="index"
+          :id="'card-' + index"
+          :class="{ cardd: true, active: index === currentIndex }"
+        />
+      </div>
     </div>
 
     <div class="button-container">
@@ -75,18 +82,18 @@
         </div>
       </div>
       <div class="btn-kunjungan-text">
-        <button>Dapatkan Tiket Sekarang!</button>
+        <a href="/#/booking"><button style="cursor: pointer;">Dapatkan Tiket Sekarang!</button></a>
       </div>
 
       <div class="container-tiket-kunjungan">
-        <div class="tiket-kunjungan" v-for="(element, index) in elementTiketKunjungan" :key="index">
+        <a href="/#/booking"><div class="tiket-kunjungan" v-for="(element, index) in elementTiketKunjungan" :key="index">
           <div class="text-tiket-kunjungan">
             <div class="text-tiket">{{ element.text1 }}</div>
             <p class="text-harga">{{ element.text2 }}</p>
             <p class="text-harga" id="text-area">{{ element.text3 }}</p>
           </div>
           <img class="img-tiket-kunjungan" :src="element.img" alt="">
-        </div>
+        </div></a>
         <div class="foterr">
           <footerDesktop/>
         </div>
@@ -156,7 +163,7 @@ export default {
     },
     centerActiveCard() {
       const sliderWidth = this.$refs.slider.offsetWidth;
-      const cardWidth = 250;
+      const cardWidth = 205;
       const offset = (sliderWidth - cardWidth) / 2;
       const cardContainer = document.querySelector('.slider');
       const activeCard = document.querySelector('.cardd.active');
@@ -203,7 +210,7 @@ export default {
   width: 90%;
   margin: 0 auto;
   font-weight: 600;
-  padding-top: 15vw;
+  padding-top: 10vw;
   font-size: 1vw;
   position: relative;
 }
@@ -217,7 +224,7 @@ export default {
 }
 
 .container-title-text {
-  margin-top: -38vw;
+  margin-top: -46vw;
   color: white;
 }
 
@@ -241,11 +248,21 @@ export default {
   margin-top: 2vw;
 }
 
+.container-slider{
+  width: 95vw;
+  display: flex;
+  justify-content: center;
+  overflow-x: hidden;
+  height: 40vw;
+  align-items: center;
+  margin-left: -3vw;
+}
+
 .slider {
   display: flex;
   transition: transform 0.3s ease;
   align-items: center;
-  margin-left: 70px;
+  margin-left: 11vw;
 }
 
 .slider img {
@@ -329,7 +346,7 @@ export default {
 }
 
 .container-title2 {
-  margin-top: 10vw;
+  margin-top: 20vw;
 }
 
 .img-pagination {
@@ -450,6 +467,8 @@ export default {
   font-weight: 600;
   font-size: 1.7vw;
   height: min-content;
+  color: black;
+  text-decoration: none;
 }
 
 .text-harga {

@@ -34,6 +34,7 @@
         Menawarkan berbagai hal menarik untuk dilihat dan dipelajari, mulai dari
         sejarah, arsitektur, hingga budaya.
       </p>
+      <div class="container-slider">
       <div class="slider" ref="slider">
         <img
           v-for="(card, index) in cards"
@@ -41,8 +42,9 @@
           :key="index"
           :id="'card-' + index"
           :class="{ cardd: true, active: index === currentIndex }"
-        >
+        />
       </div>
+    </div>
 
       <div class="button-container">
     <img class="button-slider" @click="prevCard" src="../assets/svg/ArrowLeft.svg" />
@@ -82,7 +84,7 @@
             bersejarah<br />
             yang penting di kota ini.
           </p>
-          <a class="Hiasan"><img src="../assets/images/Content.svg" class="img-att-down"/></a>
+          <a class="Hiasan" href="/#/wisata/dalemagung"><img src="../assets/images/Content.svg" class="img-att-down"/></a>
         </div>
         <img alt="" class="image-Tourist" src="../assets/images/image 21.png" />
       </div>
@@ -110,7 +112,7 @@
               koleksi yang paling terkenal adalah kereta kencana Singa Barong, yang
               merupakan kereta kencana Sunan Gunung Jati.
             </p>
-            <a class="Hiasan"><img src="../assets/images/Content.svg" class="img-att-down" /></a>
+            <a class="Hiasan" href="/#/wisata/museum"><img src="../assets/images/Content.svg" class="img-att-down" /></a>
           </div>
           <img alt="" class="image-Tourist3" src="../assets/images/image 35.png" />
         </div>
@@ -177,10 +179,10 @@
           </div>
         </div>
         <div class="btn-kunjungan-text">
-          <button>Dapatkan Tiket Sekarang!</button>
+          <a href="/#/booking"><button style="cursor: pointer;">Dapatkan Tiket Sekarang!</button></a>
         </div>
 
-        <div class="container-tiket-kunjungan">
+        <a href="/#/booking"><div class="container-tiket-kunjungan">
           <div class="tiket-kunjungan" v-for="(element, index) in elementTiketKunjungan" :key="index">
             <div class="text-tiket-kunjungan">
               <div class="text-tiket">{{element.text1}}</div>
@@ -189,7 +191,7 @@
             </div>
             <img class="img-tiket-kunjungan" src="../assets/images/tiketkunjungan.png" alt="">
           </div>
-        </div>
+        </div></a>
         <div class="foterr">
           <footerDesktop/>
         </div>
@@ -271,7 +273,7 @@ nextCard() {
 },
     centerActiveCard() {
       const sliderWidth = this.$refs.slider.offsetWidth;
-      const cardWidth = 250;
+      const cardWidth = 230;
       const offset = (sliderWidth - cardWidth) / 2;
       const cardContainer = document.querySelector('.slider');
       const activeCard = document.querySelector('.cardd.active');
@@ -307,7 +309,7 @@ nextCard() {
 
 .image-text {
   position: absolute;
-  top: 33VW;
+  top: 25VW;
   left: 50%;
   transform: translate(-50%, -50%);
   color: white;
@@ -320,7 +322,7 @@ nextCard() {
   display: flex;
   width: 88%;
   margin: 0 auto;
-  margin-top: -15vw;
+  margin-top: -30vw;
   color: white;
   padding-bottom: 10vw;
 }
@@ -346,7 +348,7 @@ nextCard() {
 }
 
 .Destinasi {
-  margin-top: 7vw;
+  margin-top: 15vw;
   text-align: center;
   font-size: 4vw;
 }
@@ -365,6 +367,15 @@ nextCard() {
   margin-top: 2vw;
 }
 
+.container-slider{
+  width: 95vw;
+  display: flex;
+  justify-content: center;
+  overflow-x: hidden;
+  height: 40vw;
+  align-items: center;
+}
+
 .slider {
   display: flex;
   transition: transform 0.3s ease;
@@ -373,7 +384,7 @@ nextCard() {
 }
 
 .slider img {
-  object-fit: cover;
+  object-fit: cover;  
 }
 
 .cardd {
@@ -595,6 +606,7 @@ nextCard() {
 .btn-kunjungan-text {
   width: 90%;
   margin: 0 auto;
+  cursor: pointer;
 }
 
 .btn-kunjungan-text button{
@@ -641,12 +653,15 @@ nextCard() {
   width: 100%;
   padding-top: 2vw;
   cursor: pointer;
+  text-decoration: none;
 }
 
 .text-tiket{
   font-weight: 600;
   font-size: 1.7vw;
   height: min-content;
+  text-decoration: none;
+  color: black;
 }
 
 .text-harga{

@@ -20,8 +20,9 @@
       <h2 style="padding: 0 10rem">
         {{ sectionData?.xs1?.data }}
       </h2>
-      <a :href="sectionData?.xl1?.data" v-mod class="btn1">
-        <img class="btn1" src="../assets/images/btn1.png" />
+      <a v-mod class="btn1">
+        <img class="btn1" src="../assets/images/btn1.png" 
+        @click="scrollToTop()" />
       </a>
     </div>
   </section>
@@ -50,9 +51,8 @@
   <section class="sec-home" 
   id="section3"
   :style="{
-    'background': `linear-gradient(0deg, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)),
-    url(../assets/images/Frame.png);`,
-  'background-size': 'cover;',
+    'background-image': `url(${sectionimg2})`,
+  'background-size': 'cover',
 }"
   >
     <div class="container">
@@ -194,19 +194,25 @@
 
   <section class="slider" id="slider">
     <h1 class="berita">Berita Terkini</h1>
-    <div class="slides" :style="{ transform: `translateX(${currentSlideIndex * -300 / slides.length}%)` }">
+    <div class="slides" :style="{ transform: `translateX(${currentSlideIndex * -300 / slides.length}%)` }"
+    @mouseenter="pauseSlider"
+    @mouseleave="resumeSlider"
+    >
       <div v-for="(slide, index) in slides" :key="index" class="slide">
+        <a :href="slide.link">
         <div class="news-section" :to="slide.link">
           <div class="news-image">
             <img :src="slide.imageUrl" :alt="`Berita ${index + 1}`">
           </div>
           <div class="news-content">
             <h2 class="news-title">{{ slide.title }}</h2>
+            <p class="news-sum">{{ slide.summary }}</p>
           </div>
         </div>
+      </a>
       </div>
     </div>
-    <img class="newsbtn" src="../assets/images/btninfo.png" />
+    <a href="#/beritaterkini"><img class="newsbtn" src="../assets/images/btninfo.png" /></a>
   </section>
 
 
@@ -237,46 +243,48 @@
   </section>
 
   <section class="sec-home" id="section7">
-    <div class="container">
-      <div class="text">
-        <p class="faqText">{{ sectionName6 }}</p>
-        <h2 class="tanyaText">{{ sectionData6?.xs1.data }}</h2>
-      </div>
-      <div class="faq">
-        <div
-          style="border-bottom: 1px solid black"
-          v-for="(faq, index) in faqs"
-          :key="index"
-        >
-          <button class="accordion" @click="toggleAccordion(index)">
-            <span class="nomor">{{ faq.nomor }}</span> {{ faq.pertanyaan }}
-            <svg
-              width="32"
-              height="32"
-              viewBox="0 0 32 32"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              :class="{ active: faq.active }"
-            >
-              <path
-                d="M16 3C13.4288 3 10.9154 3.76244 8.77759 5.1909C6.63975 6.61935 4.97351 8.64968 3.98957 11.0251C3.00563 13.4006 2.74819 16.0144 3.2498 18.5362C3.75141 21.0579 4.98953 23.3743 6.80762 25.1924C8.6257 27.0105 10.9421 28.2486 13.4638 28.7502C15.9856 29.2518 18.5995 28.9944 20.9749 28.0104C23.3503 27.0265 25.3807 25.3603 26.8091 23.2224C28.2376 21.0846 29 18.5712 29 16C28.9964 12.5533 27.6256 9.24882 25.1884 6.81163C22.7512 4.37445 19.4467 3.00364 16 3ZM21.7075 14.7075L16.7075 19.7075C16.6146 19.8005 16.5043 19.8742 16.3829 19.9246C16.2615 19.9749 16.1314 20.0008 16 20.0008C15.8686 20.0008 15.7385 19.9749 15.6171 19.9246C15.4957 19.8742 15.3854 19.8005 15.2925 19.7075L10.2925 14.7075C10.1049 14.5199 9.99945 14.2654 9.99945 14C9.99945 13.7346 10.1049 13.4801 10.2925 13.2925C10.4801 13.1049 10.7346 12.9994 11 12.9994C11.2654 12.9994 11.5199 13.1049 11.7075 13.2925L16 17.5863L20.2925 13.2925C20.3854 13.1996 20.4957 13.1259 20.6171 13.0756C20.7385 13.0253 20.8686 12.9994 21 12.9994C21.1314 12.9994 21.2615 13.0253 21.3829 13.0756C21.5043 13.1259 21.6146 13.1996 21.7075 13.2925C21.8004 13.3854 21.8741 13.4957 21.9244 13.6171C21.9747 13.7385 22.0006 13.8686 22.0006 14C22.0006 14.1314 21.9747 14.2615 21.9244 14.3829C21.8741 14.5043 21.8004 14.6146 21.7075 14.7075Z"
-                fill="#D9A520"
-              />
-            </svg></button
-          ><svg
-            width="1064"
-            height="1"
-            viewBox="0 0 1064 1"
+  <div class="container">
+    <div class="text">
+      <p class="faqText">{{ sectionName6 }}</p>
+      <h2 class="tanyaText">{{ sectionData6?.xs1.data }}</h2>
+    </div>
+    <div class="faq">
+      <div
+        style="border-bottom: 1px solid black"
+        v-for="(faq, index) in faqs"
+        :key="index"
+      >
+        <button class="accordion" @click="toggleAccordion(index)">
+          <span class="nomor">{{ faq.nomor }}</span> {{ faq.pertanyaan }}
+          <svg
+            width="32"
+            height="32"
+            viewBox="0 0 32 32"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
-          ></svg>
-          <div class="panel" v-show="faq.active">
-            <p class="jawaban">{{ faq.jawaban }}</p>
-          </div>
+            :class="{ active: faq.active }"
+          >
+            <path
+              d="M16 3C13.4288 3 10.9154 3.76244 8.77759 5.1909C6.63975 6.61935 4.97351 8.64968 3.98957 11.0251C3.00563 13.4006 2.74819 16.0144 3.2498 18.5362C3.75141 21.0579 4.98953 23.3743 6.80762 25.1924C8.6257 27.0105 10.9421 28.2486 13.4638 28.7502C15.9856 29.2518 18.5995 28.9944 20.9749 28.0104C23.3503 27.0265 25.3807 25.3603 26.8091 23.2224C28.2376 21.0846 29 18.5712 29 16C28.9964 12.5533 27.6256 9.24882 25.1884 6.81163C22.7512 4.37445 19.4467 3.00364 16 3ZM21.7075 14.7075L16.7075 19.7075C16.6146 19.8005 16.5043 19.8742 16.3829 19.9246C16.2615 19.9749 16.1314 20.0008 16 20.0008C15.8686 20.0008 15.7385 19.9749 15.6171 19.9246C15.4957 19.8742 15.3854 19.8005 15.2925 19.7075L10.2925 14.7075C10.1049 14.5199 9.99945 14.2654 9.99945 14C9.99945 13.7346 10.1049 13.4801 10.2925 13.2925C10.4801 13.1049 10.7346 12.9994 11 12.9994C11.2654 12.9994 11.5199 13.1049 11.7075 13.2925L16 17.5863L20.2925 13.2925C20.3854 13.1996 20.4957 13.1259 20.6171 13.0756C20.7385 13.0253 20.8686 12.9994 21 12.9994C21.1314 12.9994 21.2615 13.0253 21.3829 13.0756C21.5043 13.1259 21.6146 13.1996 21.7075 13.2925C21.8004 13.3854 21.8741 13.4957 21.9244 13.6171C21.9747 13.7385 22.0006 13.8686 22.0006 14C22.0006 14.1314 21.9747 14.2615 21.9244 14.3829C21.8741 14.5043 21.8004 14.6146 21.7075 14.7075Z"
+              fill="#D9A520"
+            />
+          </svg>
+        </button>
+        <svg
+          width="1064"
+          height="1"
+          viewBox="0 0 1064 1"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        ></svg>
+        <div class="panel" v-show="faq.active">
+          <p class="jawaban">{{ faq.jawaban }}</p>
         </div>
       </div>
     </div>
-  </section>
+  </div>
+</section>
+
 
   <section class="sec-home" id="section8">
     <bawah class="footer"></bawah>
@@ -284,10 +292,10 @@
 </template>
 
 <script setup>
+import { ref, onMounted, onBeforeUnmount } from "vue";
 import navbar from "../components/NavBar.vue";
 import bawah from "../components/footerDesktop.vue";
 import socket from "src/socket";
-import { ref, onMounted, onBeforeUnmount } from "vue";
 </script>
 
 <script>
@@ -371,19 +379,18 @@ export default {
     },
     async fetchNews(){
       try{
-        const response = await this.$api.get('news')
-        console.log(response.data.data)
+        const response = await this.$api.get('news');
+        console.log(response.data.data);
         this.slides = response.data.data.map(news => ({
           imageUrl: news.image,
           link: news.link,
           title: news.title,
           summary: news.desc
-        }))
+        }));
 
-        console.log(this.slides)
-      
+        console.log(this.slides);
       }catch(err){
-        console.log(err)
+        console.log(err);
       }
     },
     async fetchData() {
@@ -403,6 +410,7 @@ export default {
         this.sectionData1 = dataRest.contents[1].context;
 
         this.sectionName2 = dataRest.contents[2].sectionName;
+        this.sectionData2 = dataRest.contents[2].context;
         this.sectionimg2 = dataRest.contents[2]?.context?.xi1?.data;
 
         this.sectionName3 = dataRest.contents[3].sectionName;
@@ -419,7 +427,6 @@ export default {
         this.sectionData6 = dataRest.contents[6].context;
 
         this.currentBackground = this.sectionimg4;
-
       } catch (err) {
         console.log(err);
       }
@@ -429,10 +436,25 @@ export default {
     },
     nextSlide() {
       this.currentSlideIndex = (this.currentSlideIndex + 1) % this.slides.length;
+    },
+    pauseSlider() {
+     clearInterval(this.sliderInterval);
+    },
+    resumeSlider() {
+      this.startSlider();
+    },
+    toggleAccordion(index) {
+      this.faqs[index].active = !this.faqs[index].active;
     }
   }
-};
+}
+const scrollToTop = () => {
+  document.querySelector('#hero').scrollIntoView({
+    behavior: 'smooth'
+  });
+}
 </script>
+
 
 
 
@@ -442,30 +464,10 @@ export default {
 @import url("https://fonts.googleapis.com/css2?family=Inria+Serif:wght@400;700&display=swap");
 @import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css");
 
-/* #hero {
-  min-height: 100vh;
-  background: linear-gradient(0deg, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)),
-    url("../assets/images/bg1.png");
-  background-repeat: no-repeat;
-  background-size: cover;
-  background-position: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-} */
 .texthero {
   text-align: center;
   color: white;
 }
-
-/* #section1 .container {
-  background: linear-gradient(0deg, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)),
-    url("../assets/images/bg1.png");
-  background-size: cover;
-  margin-top: -110px;
-  z-index: -999;
-} */
 
 #section2 .container {
   background-image: linear-gradient(transparent, #fff9a0, #ffe96e);
@@ -475,8 +477,7 @@ export default {
 }
 
 #section3 .container {
-  background: linear-gradient(0deg, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)),
-  url("../assets/images/keraton2.png");
+  background: linear-gradient(0deg, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4));
   background-size: cover;
 }
 
@@ -502,7 +503,6 @@ export default {
   background: rgba(0, 0, 0, 0.4);
   backdrop-filter: blur(3px);
 }
-
 #section5 .container .text {
   position: absolute;
   margin-top: 12rem;
@@ -536,6 +536,15 @@ export default {
   background-position: center;
 }
 
+
+.sl
+.btn1-img {
+  display: block;
+}
+
+.btn1:hover .btn1-img {
+  filter: brightness(70%);
+}
 .slider h2 {
   text-align: left;
   margin-bottom: 20px;
@@ -554,7 +563,10 @@ export default {
   min-width: 100%;
   box-sizing: border-box;
 }
-
+.slide a{
+  text-decoration: none;
+  color: #000000;
+}
 .news-section {
   display: flex;
   align-items: center;
@@ -585,9 +597,9 @@ export default {
   font-weight: 500;
 }
 
-.news-summary {
-  font-size: 16px;
-  color: #555;
+.news-sum {
+  font-size: 25px;
+  color: #000000;
 }
 
 .berita{
@@ -618,12 +630,11 @@ export default {
         }
 
   .newsbtn {
-  padding: 5px;
-  gap: 10px;
   position: relative;
-  margin-top: 1rem;
   cursor: pointer;
   margin-left: 42vw;
+  margin-bottom: 2vw;
+
 }
 
 .newsbtn:hover {
@@ -644,27 +655,13 @@ export default {
   font-family: Raleway, sans-serif;
 }
 
-/* .wlcText {
-  font-size: 24px;
-  color: #fffd8c;
-  position: absolute;
-  left: 41vw;
-  top: 22vw;
-  padding: 1rem;
-}
-
-.wlcText2 {
-  position: relative;
-  font-size: 64px;
-  top: 2vw;
-} */
-
 .btn1 {
-  top: 65%;
-  left: 49, 5%;
-  position: absolute;
+  position: fixed;
+  top: 85%;
+  left: 90.5%;
+  z-index: 1000; /* Memastikan tombol berada di atas elemen lain */
+  display: inline-block;
 }
-
 .btn1:hover {
   filter: brightness(70%);
 }
@@ -697,7 +694,7 @@ export default {
   top: 43%;
   font-family: "Raleway";
   width: 33%;
-  left: 34%;
+  left: 33.2%;
   font-weight: 400;
   font-size: 20px;
   line-height: 28px;
@@ -1426,15 +1423,9 @@ input::placeholder {
     width: 328px;
   }
 
-  .btn1 {
-    top: 65%;
-    left: 45%;
-    position: absolute;
-  }
 
-  .btn1:hover {
-    filter: brightness(70%);
-  }
+
+
 
   .aboutText {
     position: absolute;

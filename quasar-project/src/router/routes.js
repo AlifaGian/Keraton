@@ -1,7 +1,9 @@
 import SignIn from "../pages/SignIn.vue";
 import SignUp from "../pages/SignUp.vue";
-import SejarahLP from "../pages/sejarahKeraton.vue";
+import SejarahLP from "../pages/SejarahKeraton.vue";
 import HistoryTransaksi from "../pages/HistoryTransaksi.vue";
+import AfterCheckoutViews from "../pages/AfterCheckoutViews.vue";
+import Beritaterkini from "../pages/BeritaTerkini.vue";
 import AreaKeraton from "../pages/AreaKeraton.vue";
 import Museum from "../pages/MuseumPage.vue";
 import CheckoutKeraton from "../pages/CheckoutKeraton.vue";
@@ -19,6 +21,7 @@ import AdminAddPage from "../pages/Admin/AddPage.vue";
 import NyobaAdmin from "../pages/nyobaAdmin.vue";
 import Cart from "../pages/CartPage.vue";
 import Template from "../pages/TicketTemplate.vue";
+import Berita from "../pages/BeritaTerkini.vue";
 
 const routes = [
   {
@@ -82,6 +85,11 @@ const routes = [
     component: HistoryTransaksi,
   },
   {
+    path: "/aftercheckout",
+    name: "aftercheckout",
+    component: AfterCheckoutViews,
+  },
+  {
     path: "/booking/events",
     name: "eventgratis",
     component: EventGratis,
@@ -125,6 +133,11 @@ const routes = [
     path: "/template",
     name: "Template",
     component: Template,
+  },
+  {
+    path: "/beritaterkini",
+    name: "Beritaterkini",
+    component: Beritaterkini,
   },
 ];
 

@@ -1,4 +1,3 @@
-
 <script setup>
 import { ref } from 'vue'
 import paymentDropdownTemplate from '../PaymentDropdownTemplate'
@@ -16,6 +15,7 @@ const toggleExpand = (index) => {
   <div class="payment-method__dropdown" v-for="(template, index) in paymentTemplate" :key="index">
     <div class="payment-method__dropdown-header" @click="toggleExpand(index)">
       <p class="fs-h5">{{ template.title }}</p>
+        <img src="../assets/svg/CaretDown.svg" :class="{ expanded: expanded[index] }" alt="">
       <ph-caret-down :size="16" weight="bold" class="icon transition-all-300" :class="{ expanded: expanded[index] }" />
     </div>
     <div class="payment-method__dropdown-content" :class="{ expanded: expanded[index] }">
@@ -30,7 +30,7 @@ const toggleExpand = (index) => {
   </div>
 </template>
 
-<style>
+<style scoped>
 .payment-method__dropdown {
   border-radius: 0.5rem;
   background-color: #fff;
@@ -41,12 +41,23 @@ const toggleExpand = (index) => {
 .payment-method__dropdown-header {
   display: flex;
   align-items: center;
+  text-align: center;
+  font-size: 25px;
+  line-height: 20px;
   justify-content: space-between;
   background-color: #fff;
-  padding: 0.5rem 0;
+  padding: 0.5rem 0 ;
+  gap: 5rem;
   cursor: pointer;
 }
-
+.payment-method__dropdown-header img {
+  margin-left: auto;
+  margin-right: -5rem; 
+  transition: transform 0.3s ease;
+}
+.payment-method__dropdown-header  img.expanded {
+  transform: rotate(180deg);
+}
 .payment-method__dropdown-content {
   padding: 0 0.5rem;
   max-height: 0;
@@ -60,6 +71,7 @@ const toggleExpand = (index) => {
   max-height: 1000px;
   margin-bottom: 0.5rem;
   transition: max-height 0.3s ease;
+
 }
 
 .icon.expanded {

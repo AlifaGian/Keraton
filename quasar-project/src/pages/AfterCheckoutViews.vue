@@ -2,7 +2,7 @@
 import NavBar from '../components/NavBar.vue'
 import { onMounted } from 'vue'
 import logoBJB from '../assets/images/bjb.png'
-import LoaderPayment from '../views/LoaderPayment.vue'
+import LoaderPayment from '../pages/LoaderPayment.vue'
 import PaymentPopup from '../components/PaymentPopup.vue'
 import afterCheckoutFunc from '../afterCheckoutFunc'
 
@@ -156,6 +156,7 @@ main {
   align-items: flex-start;
   padding: 4rem;
   gap: 3.5rem;
+  margin-top: 5vw;
 }
 .after-checkout-content__container,
 .after-checkout-detail__container {

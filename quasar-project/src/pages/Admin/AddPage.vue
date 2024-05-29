@@ -3,7 +3,7 @@
     <div class="text-center text-h6 text-bold q-mt-md">
       Edit Section {{ sectionName }}
     </div>
-    <div class="text-center q-mt-sm">Ubah dan alur konten web Keraton</div>
+    <div class="text-center q-mt-sm">Ubah dan atur konten web Keraton</div>
 
     <div style="padding-inline: 300px; margin-top: 120px">
       <div class="col-grow">
@@ -103,6 +103,7 @@
         text-color="white"
         label="Save and Update"
         class="full-width q-mt-md"
+
       />
     </div>
     <Notification
@@ -201,7 +202,7 @@ export default {
     async sendUpdate() {
       try {
         let formData = new FormData();
-
+        this.$router.push('/#/');
         formData.append("pageId", 1);
         formData.append("sectionName", this.sectionName);
         formData.append("sectionOrder", this.sectionOrder);

@@ -92,79 +92,17 @@
           <img src="../assets/images/n1.png" alt="" class="img-keraton5">
         </div>
       </div>
-
-      <div class="footer">
-        <div class="logo">
-          <img src="../assets/images/logo_keraton.png" alt="">
-          <p>KERATON <br>KASEPUHAN <br>CIREBON</p>
-        </div>
-        <div class="footer-col">
-          <div class="footer-col-1">
-            <h4>Quick Links</h4>
-            <ul>
-              <li><a href="#">Beranda</a></li>
-              <li><a href="#">Sejarah</a></li>
-              <li><a href="#">Booking</a></li>
-              <li><a href="#">Objek Wisata</a></li>
-            </ul>
-          </div>
-          <div class="footer-col-2">
-            <h4>Socials</h4>
-            <ul>
-              <li><a href="#">Whatsapp</a></li>
-              <li><a href="#">Facebook</a></li>
-              <li><a href="#">Instagram</a></li>
-              <li><a href="#">Threads</a></li>
-            </ul>
-          </div>
-          <div class="footer-col-3">
-            <h4>Company</h4>
-            <ul>
-              <li><a href="#">About us</a></li>
-              <li><a href="#">Partners</a></li>
-              <li><a href="#">Contact</a></li>
-            </ul>
-          </div>
-          <div class="footer-col-4">
-            <h4>Subscribes your email for updates!</h4>
-            <button class="button">Enter your email</button>
-          </div>
-        </div>
-        <div class="adress">
-          Jalan Kasepuhan 43
-          Cirebon, Jawa Barat
-          45114
-        </div>
-        <div class="lower">
-          <div class="inlower">
-            <p>
-              @2024 Keraton Kasepuhan Cirebon
-            </p>
-          </div>
-          <div class="footer-kanan">
-            <div class="susun">
-            <p>In collaboration</p>
-            <div class="collab">
-              <img src="../assets/images/logo_keraton.png" alt="" class="foto1">
-              <img src="../assets/images/1 931.svg" alt="" class="foto2">
-              <img src="../assets/images/telkom.svg" alt="" class="foto3">
-              <img src="../assets/images/bjb.svg" alt="" class="foto4">
-            </div>
-          </div>
-          </div>
         </div>
       </div>
-    </div>
-  </div>
+      <FooterComp/>
 </template>
 
 <script setup>
-// import navbar from "quasar-project/src/components/NavBar.vue";
-
+import navbar from '../components/NavBar.vue'
+import FooterComp from "../components/FooterComp.vue";
 </script>
 
 <script>
-import navbar from '../components/NavBar.vue'
 export default {
   data() {
     return {
@@ -365,123 +303,5 @@ ul {
 h4 {
   font-size: 2.3vw;
   line-height: 2.8vw;
-}
-
-.footer-col {
-  display: flex;
-  flex-wrap: wrap;
-  width: 100%;
-  height: 20vw;
-  margin-top: 4vw;
-}
-
-.footer-col-1 {
-  width: 16vw;
-  padding: 1.5vw;
-  box-sizing: border-box;
-}
-
-.footer-col-2,
-.footer-col-3 {
-  width: 12vw;
-  padding: 1.5vw;
-  box-sizing: border-box;
-}
-
-.footer-col-4 {
-  margin-left: 6vw;
-  padding: 1.5vw;
-  box-sizing: border-box;
-  width: 40vw;
-}
-
-.footer-col h3 {
-  margin-bottom: 20px;
-}
-
-.footer-col ul {
-  list-style: none;
-  padding: 0;
-}
-
-.footer-col li {
-  margin-bottom: 10px;
-}
-
-.footer-col a {
-  text-decoration: none;
-  color: #333;
-}
-
-.button {
-  margin-top: 2vw;
-  height: 5vw;
-  width: 100%;
-  padding-left: 1vw;
-  background-color: #123B32;
-  color: #fff;
-  text-align: left;
-  border: none;
-  cursor: pointer;
-  font-size: 1.5vw;
-  border-radius: 1vw;
-}
-
-.footer {
-  width: 90%;
-  margin: 0 auto;
-  padding-top: 10vw;
-}
-
-.adress {
-  width: 18vw;
-  font-size: 1.6vw;
-  font-weight: 400;
-  padding: 1.5vw;
-}
-
-.susun p {
-  font-size: 1.5vw;
-}
-.lower {
-  display: flex;
-  width: 100%;
-  padding-bottom: 4vw;
-}
-.inlower {
-  width: 50vw;
-}
-.inlower p{
-  margin-top: 10vw;
-  font-size: 1.3vw;
-  padding-left: 1.5vw;
-}
-.susun {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 2vw;
-  float: right;
-  width: fit-content;
-  padding-right: 4vw;
-}
-
-.foto1, .foto2, .foto3 {
-  height: 5vw;
-  width: 5vw;
-}
-
-.foto4 {
-  height: 7vw;
-  width: 7vw;
-  margin-top: -1vw;
-}
-.collab {
-  display: flex;
-  flex-direction: row;
-  gap: 4vw;
-  width: 40vw;
-  justify-content: center
 }
 </style>
