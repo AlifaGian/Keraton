@@ -109,10 +109,15 @@
       </div>
     </div>
   </div>
+  <FooterComp />
 </template>
 
-<script>
+<script setup>
 import navbar from "../components/NavBar.vue";
+import FooterComp from "../components/FooterComp.vue";
+</script>
+
+<script>
 export default {
   data() {
     return {
@@ -305,125 +310,5 @@ ul {
 h4 {
   font-size: 2.3vw;
   line-height: 2.8vw;
-}
-
-.footer-col {
-  display: flex;
-  flex-wrap: wrap;
-  width: 100%;
-  height: 20vw;
-  margin-top: 4vw;
-}
-
-.footer-col-1 {
-  width: 16vw;
-  padding: 1.5vw;
-  box-sizing: border-box;
-}
-
-.footer-col-2,
-.footer-col-3 {
-  width: 12vw;
-  padding: 1.5vw;
-  box-sizing: border-box;
-}
-
-.footer-col-4 {
-  margin-left: 6vw;
-  padding: 1.5vw;
-  box-sizing: border-box;
-  width: 40vw;
-}
-
-.footer-col h3 {
-  margin-bottom: 20px;
-}
-
-.footer-col ul {
-  list-style: none;
-  padding: 0;
-}
-
-.footer-col li {
-  margin-bottom: 10px;
-}
-
-.footer-col a {
-  text-decoration: none;
-  color: #333;
-}
-
-.button {
-  margin-top: 2vw;
-  height: 5vw;
-  width: 100%;
-  padding-left: 1vw;
-  background-color: #123b32;
-  color: #fff;
-  text-align: left;
-  border: none;
-  cursor: pointer;
-  font-size: 1.5vw;
-  border-radius: 1vw;
-}
-
-.footer {
-  width: 90%;
-  margin: 0 auto;
-  padding-top: 10vw;
-}
-
-.adress {
-  width: 18vw;
-  font-size: 1.6vw;
-  font-weight: 400;
-  padding: 1.5vw;
-}
-
-.susun p {
-  font-size: 1.5vw;
-}
-.lower {
-  display: flex;
-  width: 100%;
-  padding-bottom: 4vw;
-}
-.inlower {
-  width: 50vw;
-}
-.inlower p {
-  margin-top: 10vw;
-  font-size: 1.3vw;
-  padding-left: 1.5vw;
-}
-.susun {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 2vw;
-  float: right;
-  width: fit-content;
-  padding-right: 4vw;
-}
-
-.foto1,
-.foto2,
-.foto3 {
-  height: 5vw;
-  width: 5vw;
-}
-
-.foto4 {
-  height: 7vw;
-  width: 7vw;
-  margin-top: -1vw;
-}
-.collab {
-  display: flex;
-  flex-direction: row;
-  gap: 4vw;
-  width: 40vw;
-  justify-content: center;
 }
 </style>

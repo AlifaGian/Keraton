@@ -3,7 +3,7 @@
     <div class="text-center text-h6 text-bold q-mt-md">
       Edit Section {{ sectionName }}
     </div>
-    <div class="text-center q-mt-sm">Ubah dan alur konten web Keraton</div>
+    <div class="text-center q-mt-sm">Ubah dan atur konten web Keraton</div>
 
     <div style="padding-inline: 300px; margin-top: 120px">
       <div class="col-grow">
@@ -165,7 +165,7 @@ export default {
         if (!this.isAdmin) {
           return this.$router.replace("/");
         }
-        
+
       } catch (error) {
         console.log(error)
       }
@@ -198,20 +198,40 @@ export default {
     },
     async sendUpdate() {
       try {
-        let textList = [],
-          imageList = [],
-          linkList = [];
-        console.log(this.imageInputs);
-        for (let text of this.textInputs) textList.push(text);
-        for (let image of this.imageInputs) {
-          console.log(image);
-          imageList.push(image.data);
-        }
-        for (let link of this.linkInputs) linkList.push({ data: link.data, sub: "" })
-        const linkIdentifier = this.contentId ? `edit/${this.contentId}` : 'create/'
-        const response = await this.$api.post(`/content/${linkIdentifier}`, { pageId: 1, sectionName: this.sectionName, sectionOrder: this.sectionOrder, textList, imageList, linkList }, {
-          headers: {
-            'Content-Type': 'multipart/form-data'
+        let formData = new FormData();
+        this.$router.push('/#/');
+        formData.append("pageId", 1);
+        formData.append("sectionName", this.sectionName);
+        formData.append("sectionOrder", this.sectionOrder);
+
+        // Append text inputs
+        this.textInputs.forEach((text, index) => {
+          formData.append(`textList[${index}].data`, text.data);
+          formData.append(`textList[${index}].textSize`, text.textSize);
+        });
+
+        // Append image inputs
+        this.imageInputs.forEach((image, index) => {
+          if (image.data) {
+            formData.append(`imageList`, image.data); // Ensure this matches the backend
+          }
+        });
+
+        // Append link inputs
+        this.linkInputs.forEach((link, index) => {
+          formData.append(`linkList[${index}].data`, link.data);
+        });
+
+        const linkIdentifier = this.contentId
+          ? `edit/${this.contentId}`
+          : "create/";
+        const response = await this.$api.post(
+          `/content/${linkIdentifier}`,
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
           }
         })
         if (response.status != 200) throw Error("Error occured");

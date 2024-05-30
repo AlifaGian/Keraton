@@ -10,7 +10,9 @@
             <img
               style="width: 3.2rem"
               alt="icon-aplikasi"
-              src="../assets/images/logo_keraton-removebg-preview.png"
+              src="../assets/images/logo_keraton.png"
+              clickable
+              to="/"
               class="app-icon"
             />
           </div>

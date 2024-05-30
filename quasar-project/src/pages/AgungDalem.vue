@@ -34,19 +34,23 @@
     </div>
 
     <div class="container-title2">
-      <div><span>Mengapresiasi</span> nilai seni Cirebon</div>
+      <div class="bawah-title">
+        <span>Mengapresiasi</span> nilai seni Cirebon
+      </div>
       <p class="bawah-title2">
         Dalem Agung Pakungwati merupakan kompleks bangunan utama di Keraton
         Kasepuhan, Cirebon, Jawa Barat.
       </p>
-      <div class="slider" ref="slider">
-        <img
-          v-for="(card, index) in cards"
-          :src="card.content"
-          :key="index"
-          :id="'card-' + index"
-          :class="{ cardd: true, active: index === currentIndex }"
-        />
+      <div class="container-slider">
+        <div class="slider" ref="slider">
+          <img
+            v-for="(card, index) in cards"
+            :src="card.content"
+            :key="index"
+            :id="'card-' + index"
+            :class="{ cardd: true, active: index === currentIndex }"
+          />
+        </div>
       </div>
 
       <div class="button-container">
@@ -102,26 +106,29 @@
           </div>
         </div>
         <div class="btn-kunjungan-text">
-          <q-btn
-            no-caps
-            to="/booking"
-            class="button-dapatkan"
-            label="Dapatkan Tiket Sekarang!"
-          />
+          <a href="/#/booking"
+            ><button style="cursor: pointer">
+              Dapatkan Tiket Sekarang!
+            </button></a
+          >
         </div>
 
         <div class="container-tiket-kunjungan">
-          <div
-            class="tiket-kunjungan"
-            v-for="(element, index) in elementTiketKunjungan"
-            :key="index"
-          >
-            <div class="text-tiket-kunjungan">
-              <div class="text-tiket">{{ element.text1 }}</div>
-              <p class="text-harga">{{ element.text2 }}</p>
-              <p class="text-harga" id="text-area">{{ element.text3 }}</p>
-            </div>
-            <img class="img-tiket-kunjungan" :src="element.img" alt="" />
+          <a href="/#/booking"
+            ><div
+              class="tiket-kunjungan"
+              v-for="(element, index) in elementTiketKunjungan"
+              :key="index"
+            >
+              <div class="text-tiket-kunjungan">
+                <div class="text-tiket">{{ element.text1 }}</div>
+                <p class="text-harga">{{ element.text2 }}</p>
+                <p class="text-harga" id="text-area">{{ element.text3 }}</p>
+              </div>
+              <img class="img-tiket-kunjungan" :src="element.img" alt="" /></div
+          ></a>
+          <div class="footerr">
+            <footerDesktop />
           </div>
         </div>
       </div>
@@ -185,8 +192,8 @@ export default {
       return Array(this.cards.length).fill("");
     },
   },
-  mounted(){
-    this.fetchData()
+  mounted() {
+    this.fetchData();
   },
   methods: {
     prevCard() {
@@ -205,7 +212,7 @@ export default {
     },
     centerActiveCard() {
       const sliderWidth = this.$refs.slider.offsetWidth;
-      const cardWidth = 250;
+      const cardWidth = 205;
       const offset = (sliderWidth - cardWidth) / 2;
       const cardContainer = document.querySelector(".slider");
       const activeCard = document.querySelector(".cardd.active");
@@ -216,20 +223,23 @@ export default {
         cardContainer.style.transform = `translateX(${newPosition}px)`;
       }
     },
-    async fetchData(){
-      try{
-        const response = await this.$api.get('wisata/3')
-        if(response.status != 200) throw Error(response.data.message)
-        const { wisataData, orderData } = response.data.data
-        this.wisataName = wisataData.name
-        this.elementTiketKunjungan = orderData.map(order => ({
+    async fetchData() {
+      try {
+        const response = await this.$api.get("wisata/3");
+        if (response.status != 200) throw Error(response.data.message);
+        const { wisataData, orderData } = response.data.data;
+        this.wisataName = wisataData.name;
+        this.elementTiketKunjungan = orderData.map((order) => ({
           img: order.image,
           text1: order.name,
-          text2: order.price < 0 ? "Free" : `Rp. ${this.formatRupiah(order.price)} / ${order.units}`,
-          text3: order.wisataDesc
-        }))
-      }catch(err){
-        console.log(err)
+          text2:
+            order.price < 0
+              ? "Free"
+              : `Rp. ${this.formatRupiah(order.price)} / ${order.units}`,
+          text3: order.wisataDesc,
+        }));
+      } catch (err) {
+        console.log(err);
       }
     },
     formatRupiah(price) {
@@ -268,12 +278,15 @@ export default {
   position: relative;
 }
 
+.container-title-top {
+  padding-bottom: 10vw;
+}
 .container-subtitle {
   display: flex;
   width: 90%;
   margin: 0 auto;
   font-weight: 600;
-  padding-top: 15vw;
+  padding-top: 10vw;
   font-size: 1vw;
   position: relative;
 }
@@ -287,7 +300,7 @@ export default {
 }
 
 .container-title-text {
-  margin-top: -38vw;
+  margin-top: -46vw;
   color: white;
 }
 
@@ -301,6 +314,18 @@ export default {
   margin: 0 auto;
 }
 
+/* .container-title2{
+  margin-top: 10vw;
+} */
+
+.bawah-title {
+  text-align: center;
+  margin: 0 auto;
+  width: 67vw;
+  color: #5e5e5e;
+  font-size: 1.6vw;
+  margin-top: 5vw;
+}
 .bawah-title2 {
   text-align: center;
   margin: 0 auto;
@@ -308,6 +333,16 @@ export default {
   color: #5e5e5e;
   font-size: 1.6vw;
   margin-top: 2vw;
+}
+
+.container-slider {
+  width: 95vw;
+  display: flex;
+  justify-content: center;
+  overflow-x: hidden;
+  height: 40vw;
+  align-items: center;
+  margin-left: -3vw;
 }
 
 .slider {
@@ -513,6 +548,8 @@ export default {
   width: 100%;
   padding-top: 2vw;
   cursor: pointer;
+  text-decoration: none;
+  color: black;
 }
 
 .text-tiket {

@@ -36,6 +36,7 @@
         Menawarkan berbagai hal menarik untuk dilihat dan dipelajari, mulai dari
         sejarah, arsitektur, hingga budaya.
       </p>
+      <div class="container-slider">
       <div class="slider" ref="slider">
         <img
           v-for="(card, index) in cards"
@@ -45,6 +46,7 @@
           :class="{ cardd: true, active: index === currentIndex }"
         />
       </div>
+    </div>
 
       <div class="button-container">
         <img
@@ -76,6 +78,27 @@
             /></a>
           </div>
         </div>
+<<<<<<< HEAD
+=======
+        
+        <div class="tourist-attraction">
+      <div class="Tourist-Container Tourist-Container1">
+        <div class="Tourist-content">
+          <a class="Hiasan"><img src="../assets/images/Tagline.svg" class="img-att-top" /></a>
+          <p class="Dalem">Dalem Agung Pakungwati</p>
+          <p class="Isi-Dalem">
+            Dalem Agung Pakungwati merupakan kompleks bangunan utama<br />
+            keraton. Kompleks ini terdiri dari berbagai bangunan, seperti
+            pendopo,<br />
+            masjid, dan museum. Masjid Agung Kasepuhan merupakan salah satu<br />
+            masjid tertua di Cirebon dan merupakan salah satu bangunan
+            bersejarah<br />
+            yang penting di kota ini.
+          </p>
+          <a class="Hiasan" href="/#/wisata/dalemagung"><img src="../assets/images/Content.svg" class="img-att-down"/></a>
+        </div>
+        <img alt="" class="image-Tourist" src="../assets/images/image 21.png" />
+>>>>>>> 91b5bc520486399a84e5cd591b23406207af47ad
       </div>
 
       <div class="tourist-attraction">
@@ -139,9 +162,13 @@
               satu koleksi yang paling terkenal adalah kereta kencana Singa
               Barong, yang merupakan kereta kencana Sunan Gunung Jati.
             </p>
+<<<<<<< HEAD
             <a class="Hiasan"
               ><img src="../assets/images/Content.svg" class="img-att-down"
             /></a>
+=======
+            <a class="Hiasan" href="/#/wisata/museum"><img src="../assets/images/Content.svg" class="img-att-down" /></a>
+>>>>>>> 91b5bc520486399a84e5cd591b23406207af47ad
           </div>
           <img
             alt=""
@@ -207,11 +234,24 @@
         </div>
       </div>
 
+<<<<<<< HEAD
       <div class="container-kunjungan-text">
         <div class="Lokasi kunjungan-text1">Kunjungan</div>
         <div class="Lokasi-samping kunjungan-text2">
           Kunjungi Keraton Kasepuhan Cirebon dengan berbagai pilihan paket
           wisata yang menarik
+=======
+        <div class="container-kunjungan-text">
+          <div class="Lokasi kunjungan-text1">
+            Kunjungan
+          </div>
+          <div class="Lokasi-samping kunjungan-text2">
+            Kunjungi Keraton Kasepuhan Cirebon dengan berbagai pilihan paket wisata yang menarik
+          </div>
+        </div>
+        <div class="btn-kunjungan-text">
+          <a href="/#/booking"><button style="cursor: pointer;">Dapatkan Tiket Sekarang!</button></a>
+>>>>>>> 91b5bc520486399a84e5cd591b23406207af47ad
         </div>
       </div>
       <div class="btn-kunjungan-text">
@@ -223,6 +263,7 @@
         />
       </div>
 
+<<<<<<< HEAD
       <div class="container-tiket-kunjungan">
         <div
           class="tiket-kunjungan"
@@ -244,6 +285,21 @@
       <div class="foterr">
         <footerDesktop />
       </div>
+=======
+        <a href="/#/booking"><div class="container-tiket-kunjungan">
+          <div class="tiket-kunjungan" v-for="(element, index) in elementTiketKunjungan" :key="index">
+            <div class="text-tiket-kunjungan">
+              <div class="text-tiket">{{element.text1}}</div>
+              <p class="text-harga">{{element.text2}}</p>
+              <p class="text-harga" id="text-area">{{element.text3}}</p>
+            </div>
+            <img class="img-tiket-kunjungan" src="../assets/images/tiketkunjungan.png" alt="">
+          </div>
+        </div></a>
+        <div class="foterr">
+          <footerDesktop/>
+        </div>
+>>>>>>> 91b5bc520486399a84e5cd591b23406207af47ad
     </div>
   </div>
 </template>
@@ -347,7 +403,7 @@ export default {
     },
     centerActiveCard() {
       const sliderWidth = this.$refs.slider.offsetWidth;
-      const cardWidth = 250;
+      const cardWidth = 230;
       const offset = (sliderWidth - cardWidth) / 2;
       const cardContainer = document.querySelector(".slider");
       const activeCard = document.querySelector(".cardd.active");
@@ -407,7 +463,11 @@ export default {
 }
 .image-text {
   position: absolute;
+<<<<<<< HEAD
   top: 33vw;
+=======
+  top: 25VW;
+>>>>>>> 91b5bc520486399a84e5cd591b23406207af47ad
   left: 50%;
   transform: translate(-50%, -50%);
   color: white;
@@ -420,7 +480,7 @@ export default {
   display: flex;
   width: 88%;
   margin: 0 auto;
-  margin-top: -15vw;
+  margin-top: -30vw;
   color: white;
   padding-bottom: 10vw;
 }
@@ -446,7 +506,7 @@ export default {
 }
 
 .Destinasi {
-  margin-top: 7vw;
+  margin-top: 15vw;
   text-align: center;
   font-size: 4vw;
 }
@@ -465,6 +525,15 @@ export default {
   margin-top: 2vw;
 }
 
+.container-slider{
+  width: 95vw;
+  display: flex;
+  justify-content: center;
+  overflow-x: hidden;
+  height: 40vw;
+  align-items: center;
+}
+
 .slider {
   display: flex;
   transition: transform 0.3s ease;
@@ -473,7 +542,7 @@ export default {
 }
 
 .slider img {
-  object-fit: cover;
+  object-fit: cover;  
 }
 
 .cardd {
@@ -689,6 +758,7 @@ export default {
 .btn-kunjungan-text {
   width: 90%;
   margin: 0 auto;
+  cursor: pointer;
 }
 
 .btn-kunjungan-text .button-dapatkan {
@@ -735,12 +805,15 @@ export default {
   width: 100%;
   padding-top: 2vw;
   cursor: pointer;
+  text-decoration: none;
 }
 
 .text-tiket {
   font-weight: 600;
   font-size: 1.7vw;
   height: min-content;
+  text-decoration: none;
+  color: black;
 }
 
 .text-harga {

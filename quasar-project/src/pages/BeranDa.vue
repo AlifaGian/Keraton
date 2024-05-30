@@ -19,6 +19,13 @@
       <h2 style="padding: 0 10rem">
         {{ sectionData?.xs1?.data }}
       </h2>
+      <a v-mod class="btn1">
+        <img
+          class="btn1"
+          src="../assets/images/btn1.png"
+          @click="scrollToTop()"
+        />
+      </a>
     </div>
   </section>
 
@@ -47,9 +54,8 @@
     class="sec-home"
     id="section3"
     :style="{
-      background: `linear,
-    url(../assets/images/Frame.png);`,
-      'background-size': 'cover;',
+      'background-image': `url(${sectionimg2})`,
+      'background-size': 'cover',
     }"
   >
     <div class="container">
@@ -183,19 +189,26 @@
       :style="{
         transform: `translateX(${(currentSlideIndex * -300) / slides.length}%)`,
       }"
+      @mouseenter="pauseSlider"
+      @mouseleave="resumeSlider"
     >
       <div v-for="(slide, index) in slides" :key="index" class="slide">
-        <div class="news-section" :to="slide.link">
-          <div class="news-image">
-            <img :src="slide.imageUrl" :alt="`Berita ${index + 1}`" />
+        <a :href="slide.link">
+          <div class="news-section" :to="slide.link">
+            <div class="news-image">
+              <img :src="slide.imageUrl" :alt="`Berita ${index + 1}`" />
+            </div>
+            <div class="news-content">
+              <h2 class="news-title">{{ slide.title }}</h2>
+              <p class="news-sum">{{ slide.summary }}</p>
+            </div>
           </div>
-          <div class="news-content">
-            <p class="news-title text-h5">{{ slide.title }}</p>
-            <p class="news-summary">{{ slide.desc }}</p>
-          </div>
-        </div>
+        </a>
       </div>
     </div>
+    <a href="#/beritaterkini"
+      ><img class="newsbtn" src="../assets/images/btninfo.png"
+    /></a>
   </section>
 
   <section
@@ -230,19 +243,8 @@
     </div>
   </section>
 
-  <section id="section7">
-    <div
-      style="
-        background-size: cover;
-        height: 50vh;
-        align-items: center;
-        display: flex;
-        flex-direction: column;
-        background-position: center;
-        color: white;
-        font-family: Raleway, sans-serif;
-      "
-    >
+  <section class="sec-home" id="section7">
+    <div class="container">
       <div class="text">
         <p class="faqText">{{ sectionName6 }}</p>
         <h2 class="tanyaText">{{ sectionData6?.xs1.data }}</h2>
@@ -252,11 +254,9 @@
           style="border-bottom: 1px solid black"
           v-for="(faq, index) in faqs"
           :key="index"
-          @click="toggleAccordion(index)"
         >
           <button class="accordion" @click="toggleAccordion(index)">
-            <span class="nomor">{{ faq.nomor }}</span>
-            <span>{{ faq.pertanyaan }}</span>
+            <span class="nomor">{{ faq.nomor }}</span> {{ faq.pertanyaan }}
             <svg
               width="32"
               height="32"
@@ -292,12 +292,10 @@
 </template>
 
 <script setup>
-import cookieHandler from "src/cookieHandler";
+import { ref, onMounted, onBeforeUnmount } from "vue";
 import navbar from "../components/NavBar.vue";
 import bawah from "../components/footerDesktop.vue";
 import socket from "src/socket";
-import { ref, onMounted, onBeforeUnmount } from "vue";
-import environment from "src/stores/environment";
 </script>
 
 <script>
@@ -418,7 +416,6 @@ export default {
           imageUrl: news.image,
           link: news.link,
           title: news.title,
-          desc: news.desc,
           summary: news.desc,
         }));
 
@@ -444,6 +441,7 @@ export default {
         this.sectionData1 = dataRest.contents[1].context;
 
         this.sectionName2 = dataRest.contents[2].sectionName;
+        this.sectionData2 = dataRest.contents[2].context;
         this.sectionimg2 = dataRest.contents[2]?.context?.xi1?.data;
 
         this.sectionName3 = dataRest.contents[3].sectionName;
@@ -505,7 +503,21 @@ export default {
       this.currentSlideIndex =
         (this.currentSlideIndex + 1) % this.slides.length;
     },
+    pauseSlider() {
+      clearInterval(this.sliderInterval);
+    },
+    resumeSlider() {
+      this.startSlider();
+    },
+    toggleAccordion(index) {
+      this.faqs[index].active = !this.faqs[index].active;
+    },
   },
+};
+const scrollToTop = () => {
+  document.querySelector("#hero").scrollIntoView({
+    behavior: "smooth",
+  });
 };
 </script>
 
@@ -514,53 +526,9 @@ export default {
 @import url("https://fonts.googleapis.com/css2?family=Inria+Serif:wght@400;700&display=swap");
 @import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css");
 
-/* #hero {
-  min-height: 100vh;
-  background: linear-gradient(0deg, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)),
-    url("../assets/images/bg1.png");
-  background-repeat: no-repeat;
-  background-size: cover;
-  background-position: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-} */
 .texthero {
   text-align: center;
   color: white;
-}
-
-/* #section1 .container {
-  background: linear-gradient(0deg, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)),
-    url("../assets/images/bg1.png");
-background-size: cover;
-  margin-top: -110px;
-  z-index: -999;
-} */
-#scrollToTopBtn {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  z-index: 99;
-  border: none;
-  outline: none;
-  background-color: transparent;
-  cursor: pointer;
-  display: none;
-  padding: 0;
-}
-
-#scrollToTopBtn img {
-  width: 40px;
-  height: auto;
-  border-radius: 50%;
-  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
-}
-
-#scrollToTopBtn:hover img {
-  background-color: #555;
-  border-radius: 50%;
 }
 
 #section2 .container {
@@ -571,8 +539,7 @@ background-size: cover;
 }
 
 #section3 .container {
-  background: linear-gradient(0deg, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)),
-    url("../assets/images/keraton2.png");
+  background: linear-gradient(0deg, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4));
   background-size: cover;
 }
 
@@ -598,7 +565,6 @@ background-size: cover;
   background: rgba(0, 0, 0, 0.4);
   backdrop-filter: blur(3px);
 }
-
 #section5 .container .text {
   position: absolute;
   margin-top: 5rem;
@@ -634,6 +600,13 @@ background-size: cover;
   background-position: center;
 }
 
+.sl .btn1-img {
+  display: block;
+}
+
+.btn1:hover .btn1-img {
+  filter: brightness(70%);
+}
 .slider h2 {
   text-align: left;
   margin-bottom: 20px;
@@ -652,7 +625,10 @@ background-size: cover;
   min-width: 100%;
   box-sizing: border-box;
 }
-
+.slide a {
+  text-decoration: none;
+  color: #000000;
+}
 .news-section {
   display: flex;
   align-items: center;
@@ -683,9 +659,9 @@ background-size: cover;
   font-weight: 500;
 }
 
-.news-summary {
-  font-size: 16px;
-  color: #555;
+.news-sum {
+  font-size: 25px;
+  color: #000000;
 }
 
 .berita {
@@ -719,12 +695,10 @@ background-size: cover;
 }
 
 .newsbtn {
-  padding: 5px;
-  gap: 10px;
   position: relative;
-  margin-top: 1rem;
   cursor: pointer;
   margin-left: 42vw;
+  margin-bottom: 2vw;
 }
 
 .newsbtn:hover {
@@ -745,27 +719,13 @@ background-size: cover;
   font-family: Raleway, sans-serif;
 }
 
-/* .wlcText {
-  font-size: 24px;
-  color: #fffd8c;
-  position: absolute;
-  left: 41vw;
-  top: 22vw;
-  padding: 1rem;
-}
-
-.wlcText2 {
-  position: relative;
-  font-size: 64px;
-  top: 2vw;
-} */
-
 .btn1 {
-  top: 65%;
-  left: 49, 5%;
-  position: absolute;
+  position: fixed;
+  top: 85%;
+  left: 90.5%;
+  z-index: 1000; /* Memastikan tombol berada di atas elemen lain */
+  display: inline-block;
 }
-
 .btn1:hover {
   filter: brightness(70%);
 }
@@ -798,7 +758,7 @@ background-size: cover;
   top: 43%;
   font-family: "Raleway";
   width: 33%;
-  left: 34%;
+  left: 33.2%;
   font-weight: 400;
   font-size: 1.2vw !important;
   line-height: 28px;
@@ -1520,16 +1480,6 @@ input::placeholder {
     top: 34.3px;
     height: 120px;
     width: 328px;
-  }
-
-  .btn1 {
-    top: 65%;
-    left: 45%;
-    position: absolute;
-  }
-
-  .btn1:hover {
-    filter: brightness(70%);
   }
 
   .aboutText {
