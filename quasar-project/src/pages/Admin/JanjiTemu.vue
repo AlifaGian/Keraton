@@ -52,18 +52,19 @@
           <q-card>
             <q-card-section>
               <div class="text-h6">
-                Edit Kesediaan tanggal {{ dateInputLabel.split(" ")[0] }}
+                Edit Kesediaan tanggal Janji Temu
+                {{ dateInputLabel.split(" ")[0] }}
               </div>
             </q-card-section>
 
             <q-card-section>
-              <q-toggle
+              <!-- <q-toggle
                 v-model="dateInputChecked"
                 checked-icon="check"
                 color="red"
                 :label="dateInputChecked ? 'Active' : 'Disable'"
                 unchecked-icon="clear"
-              />
+              /> -->
               <q-input
                 outlined
                 dense
@@ -139,13 +140,13 @@
                         <div v-if="order.isEditing">
                           <q-toggle
                             v-model="order.is_janji"
-                            label="Is Janji"
+                            label="Paket Janji"
                             color="primary"
                             @update:model-value="updateOrder(order)"
                           />
                           <q-toggle
                             v-model="order.needed_for_janji"
-                            label="Needed for Janji"
+                            label="Tiket yang diperlukan untuk Janji Temu"
                             color="primary"
                             @update:model-value="updateOrder(order)"
                           />
@@ -269,12 +270,13 @@ export default {
       this.editDialog = true;
       this.idJadwal = row.id;
       this.dateInputChecked = row.disabled;
+      console.log("test", row.time.split("T")[0]);
     },
     saveChanges() {
       console.log("Changes saved:", {
-        dateInputLabel: this.dateInputLabel.value,
-        dateInput: this.dateInput.value,
-        dateInputChecked: this.dateInputChecked.value,
+        dateInputLabel: this.dateInputLabel,
+        dateInput: this.dateInput,
+        dateInputChecked: this.dateInputChecked,
       });
       if (!this.idJadwal) {
         this.createData();
@@ -311,7 +313,7 @@ export default {
         });
         if (response.status != 200) throw Error("error");
         this.fetchData();
-        this.showNotif(response.data.message, "success");
+        Swal.fire("Success!", "updated successfully!", "success");
         this.editDialog = false;
         this.idJadwal = null;
       } catch (error) {

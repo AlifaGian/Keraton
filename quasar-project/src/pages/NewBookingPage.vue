@@ -276,7 +276,7 @@ export default {
                   });
               }
               break;
-            case (2, 4):
+            case (2, 4, 5, 6):
               if (!pakets[subTypeName]) pakets[subTypeName] = [];
 
               for (let order of subType.orders) {
